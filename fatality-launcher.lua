@@ -139,6 +139,9 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.Text(u8'3. ������� ������')
                 imgui.EndTooltip()
             end
+            if imgui.Button(u8'Как дела?) then
+                sampSendChat('/ahelp')
+            end
         end
         imgui.EndTabBar()
     end
