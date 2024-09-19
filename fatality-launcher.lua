@@ -1,4 +1,4 @@
-script_version '1.3'
+script_version '1.4'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -10,7 +10,7 @@ local dlstatus = require "moonloader".download_status
 
 function update()
     local updatePath = os.getenv('TEMP')..'\\Update.json'
-    -- Проверка новой версии
+    -- ГЏГ°Г®ГўГҐГ°ГЄГ  Г­Г®ГўГ®Г© ГўГҐГ°Г±ГЁГЁ
     downloadUrlToFile("https://raw.githubusercontent.com/MSIshka2/fatality/main/fatality.json?", updatePath, function(id, status, p1, p2)
         if status == dlstatus.STATUS_ENDDOWNLOADDATA then
             local file = io.open(updatePath, 'r')
@@ -20,16 +20,16 @@ function update()
                 if info.version ~= thisScript().version then
                     lua_thread.create(function()
                         wait(2000)
-                        -- Загрузка скрипта, если версия изменилась
+                        -- Г‡Г ГЈГ°ГіГ§ГЄГ  Г±ГЄГ°ГЁГЇГІГ , ГҐГ±Г«ГЁ ГўГҐГ°Г±ГЁГї ГЁГ§Г¬ГҐГ­ГЁГ«Г Г±Гј
                         downloadUrlToFile("https://raw.githubusercontent.com/MSIshka2/fatality/main/fatality-launcher.lua?", thisScript().path, function(id, status, p1, p2)
                             if status == dlstatus.STATUS_ENDDOWNLOADDATA then
-                                -- Обновление успешно загружено, новая версия: info.version
+                                -- ГЋГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ ГіГ±ГЇГҐГёГ­Г® Г§Г ГЈГ°ГіГ¦ГҐГ­Г®, Г­Г®ГўГ Гї ГўГҐГ°Г±ГЁГї: info.version
                                 thisScript():reload()
                             end
                         end)
                     end)
                 else
-                    -- Обновлений нет
+                    -- ГЋГЎГ­Г®ГўГ«ГҐГ­ГЁГ© Г­ГҐГІ
                 end
             end
         end
@@ -43,14 +43,14 @@ local fileContent2 = ''
 local inputField = new.char[256]()
 local inputField2 = new.char[256]()
 
--- Функция для чтения содержимого файла
+-- Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї Г·ГІГҐГ­ГЁГї Г±Г®Г¤ГҐГ°Г¦ГЁГ¬Г®ГЈГ® ГґГ Г©Г«Г 
 local function readFile(filename)
     local file = io.open(filename, 'r')
     if file then
         fileContent = file:read('*all')
         file:close()
     else
-        fileContent = 'Не удалось открыть файл.'
+        fileContent = 'ГЌГҐ ГіГ¤Г Г«Г®Г±Гј Г®ГІГЄГ°Г»ГІГј ГґГ Г©Г«.'
     end
 end
 
@@ -60,7 +60,7 @@ local function readFile2(filename2)
         fileContent2 = file:read('*all')
         file:close()
     else
-        fileContent2 = 'Не удалось открыть файл.'
+        fileContent2 = 'ГЌГҐ ГіГ¤Г Г«Г®Г±Гј Г®ГІГЄГ°Г»ГІГј ГґГ Г©Г«.'
     end
 end
 
@@ -72,7 +72,7 @@ local function charArrayToString(array, length)
     local str = ''
     for i = 0, length do
         local char = string.char(array[i])
-        if char == '\0' then  -- Прекращаем, если достигли конца строки
+        if char == '\0' then  -- ГЏГ°ГҐГЄГ°Г Г№Г ГҐГ¬, ГҐГ±Г«ГЁ Г¤Г®Г±ГІГЁГЈГ«ГЁ ГЄГ®Г­Г¶Г  Г±ГІГ°Г®ГЄГЁ
             break
         end
         str = str .. char
@@ -83,53 +83,53 @@ end
 imgui.OnFrame(function() return WinState[0] end, function(player)
     imgui.Begin('##Window', WinState, imgui.WindowFlags.NoScrollbar)
     if imgui.BeginTabBar('Tabs') then
-        if imgui.BeginTabItem(u8'Машины') then
-            if imgui.Button(u8'Открыть список машин') then
-                imgui.OpenPopup(u8'Список машин')
+        if imgui.BeginTabItem(u8'ГЊГ ГёГЁГ­Г»') then
+            if imgui.Button(u8'ГЋГІГЄГ°Г»ГІГј Г±ГЇГЁГ±Г®ГЄ Г¬Г ГёГЁГ­') then
+                imgui.OpenPopup(u8'Г‘ГЇГЁГ±Г®ГЄ Г¬Г ГёГЁГ­')
             end
-            if imgui.BeginPopup(u8'Список машин') then
+            if imgui.BeginPopup(u8'Г‘ГЇГЁГ±Г®ГЄ Г¬Г ГёГЁГ­') then
                 imgui.BeginChild(u8'FileContent', imgui.ImVec2(900, 700), true)
                 imgui.TextUnformatted(fileContent)
                 imgui.EndChild()
-                if imgui.Button(u8'Закрыть', imgui.ImVec2(280, 24)) then
+                if imgui.Button(u8'Г‡Г ГЄГ°Г»ГІГј', imgui.ImVec2(280, 24)) then
                     imgui.CloseCurrentPopup()
                 end
                 imgui.EndPopup()
             end
-            imgui.InputText(u8"Id машины", inputField, 256)
-            if imgui.Button(u8"Создать машину") then
+            imgui.InputText(u8"Id Г¬Г ГёГЁГ­Г»", inputField, 256)
+            if imgui.Button(u8"Г‘Г®Г§Г¤Г ГІГј Г¬Г ГёГЁГ­Гі") then
                 local vehicleID = charArrayToString(inputField,256)
                 sampSendChat('/veh ' .. vehicleID .. ' 1 1')
             end
             imgui.SetCursorPos(imgui.ImVec2(130, 100.5))
-            if imgui.Button(u8"Удалить машину") then
+            if imgui.Button(u8"Г“Г¤Г Г«ГЁГІГј Г¬Г ГёГЁГ­Гі") then
                 sampSendChat('/adelveh')
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem(u8'Скины') then
-            if imgui.Button(u8'Открыть список скинов') then
-                imgui.OpenPopup(u8'Список скинов')
+        if imgui.BeginTabItem(u8'Г‘ГЄГЁГ­Г»') then
+            if imgui.Button(u8'ГЋГІГЄГ°Г»ГІГј Г±ГЇГЁГ±Г®ГЄ Г±ГЄГЁГ­Г®Гў') then
+                imgui.OpenPopup(u8'Г‘ГЇГЁГ±Г®ГЄ Г±ГЄГЁГ­Г®Гў')
             end
-            if imgui.BeginPopup(u8'Список скинов') then
+            if imgui.BeginPopup(u8'Г‘ГЇГЁГ±Г®ГЄ Г±ГЄГЁГ­Г®Гў') then
                 imgui.BeginChild(u8'FileContent2', imgui.ImVec2(900, 700), true)
                 imgui.TextUnformatted(fileContent2)
                 imgui.EndChild()
-                if imgui.Button(u8'Закрыть', imgui.ImVec2(280, 24)) then
+                if imgui.Button(u8'Г‡Г ГЄГ°Г»ГІГј', imgui.ImVec2(280, 24)) then
                     imgui.CloseCurrentPopup()
                 end
                 imgui.EndPopup()
             end
-            imgui.InputText(u8"Id скина", inputField2, 256)
-            if imgui.Button(u8"Сменить скин") then
+            imgui.InputText(u8"Id Г±ГЄГЁГ­Г ", inputField2, 256)
+            if imgui.Button(u8"Г‘Г¬ГҐГ­ГЁГІГј Г±ГЄГЁГ­") then
                 local skinID = charArrayToString(inputField2,256)
                 sampSendChat('/skin ' .. skinID)
                 
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem(u8'Основное') then
-            if imgui.Button(u8'Спавн') then
+        if imgui.BeginTabItem(u8'ГЋГ±Г­Г®ГўГ­Г®ГҐ') then
+            if imgui.Button(u8'Г‘ГЇГ ГўГ­') then
                 local id = getCharModel(PLAYER_PED)
                 sampSendChat('/skin ' .. '1')
                 sampSpawnPlayer()
@@ -137,14 +137,17 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             if imgui.IsItemHovered() then
                 imgui.BeginTooltip()
-                imgui.Text(u8'Если не помогло, тогда:')
-                imgui.Text(u8'1. Начните наблюдать за каким-то игроком')
-                imgui.Text(u8'2. Затем выйдите из рекона')
-                imgui.Text(u8'3. Нажмите кнопку')
+                imgui.Text(u8'Г…Г±Г«ГЁ Г­ГҐ ГЇГ®Г¬Г®ГЈГ«Г®, ГІГ®ГЈГ¤Г :')
+                imgui.Text(u8'1. ГЌГ Г·Г­ГЁГІГҐ Г­Г ГЎГ«ГѕГ¤Г ГІГј Г§Г  ГЄГ ГЄГЁГ¬-ГІГ® ГЁГЈГ°Г®ГЄГ®Г¬')
+                imgui.Text(u8'2. Г‡Г ГІГҐГ¬ ГўГ»Г©Г¤ГЁГІГҐ ГЁГ§ Г°ГҐГЄГ®Г­Г ')
+                imgui.Text(u8'3. ГЌГ Г¦Г¬ГЁГІГҐ ГЄГ­Г®ГЇГЄГі')
                 imgui.EndTooltip()
             end
-            if imgui.Button(u8'Обновление') then
+            if imgui.Button(u8'ГЋГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ') then
                 update()
+            end
+            if imgui.Button(u8'ahelp') then
+                sampSendChat('/ahelp')
             end
         end
         imgui.EndTabBar()
