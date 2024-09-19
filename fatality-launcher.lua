@@ -1,5 +1,5 @@
 script_name("fatality-launcher")
-script_version("1.3")
+script_version("1.4")
 require('lib.moonloader')
 local imgui = require 'mimgui'
 local encoding = require 'encoding'
