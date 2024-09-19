@@ -1,4 +1,4 @@
-script_version '1.4'
+script_version '1.5'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -100,9 +100,18 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 local vehicleID = charArrayToString(inputField,256)
                 sampSendChat('/veh ' .. vehicleID .. ' 1 1')
             end
-            imgui.SetCursorPos(imgui.ImVec2(130, 100.5))
+            imgui.SetCursorPos(imgui.ImVec2(90, 100.5))
             if imgui.Button(u8"Delete Car") then
                 sampSendChat('/adelveh')
+            end
+            imgui.SetCursorPos(imgui.ImVec2(8, 130.5))
+            if imgui.Button(u8"Fix Car") then
+                local playerid = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
+                sampSendChat('/hp ' .. playerid )
+            end
+            imgui.SetCursorPos(imgui.ImVec2(70, 130.5))
+            if imgui.Button(u8"Flip Car") then
+                addToCarRotationVelocity(storeCarCharIsInNoSave(PLAYER_PED), 0.0, 5, 0.0)
             end
             imgui.EndTabItem()
         end
@@ -144,9 +153,6 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             if imgui.Button(u8'Update') then
                 update()
-            end
-            if imgui.Button(u8'Test button') then
-                sampSendChat('/ahelp')
             end
         end
         imgui.EndTabBar()
