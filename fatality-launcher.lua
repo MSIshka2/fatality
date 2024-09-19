@@ -10,7 +10,7 @@ local dlstatus = require "moonloader".download_status
 
 function update()
     local updatePath = os.getenv('TEMP')..'\\Update.json'
-    -- Ïðîâåðêà íîâîé âåðñèè
+    -- Check new update
     downloadUrlToFile("https://raw.githubusercontent.com/MSIshka2/fatality/main/fatality.json?", updatePath, function(id, status, p1, p2)
         if status == dlstatus.STATUS_ENDDOWNLOADDATA then
             local file = io.open(updatePath, 'r')
@@ -20,16 +20,16 @@ function update()
                 if info.version ~= thisScript().version then
                     lua_thread.create(function()
                         wait(2000)
-                        -- Çàãðóçêà ñêðèïòà, åñëè âåðñèÿ èçìåíèëàñü
+                        -- Update script
                         downloadUrlToFile("https://raw.githubusercontent.com/MSIshka2/fatality/main/fatality-launcher.lua?", thisScript().path, function(id, status, p1, p2)
                             if status == dlstatus.STATUS_ENDDOWNLOADDATA then
-                                -- Îáíîâëåíèå óñïåøíî çàãðóæåíî, íîâàÿ âåðñèÿ: info.version
+                                -- Update successful: info.version
                                 thisScript():reload()
                             end
                         end)
                     end)
                 else
-                    -- Îáíîâëåíèé íåò
+                    -- No update
                 end
             end
         end
@@ -43,14 +43,13 @@ local fileContent2 = ''
 local inputField = new.char[256]()
 local inputField2 = new.char[256]()
 
--- Ôóíêöèÿ äëÿ ÷òåíèÿ ñîäåðæèìîãî ôàéëà
 local function readFile(filename)
     local file = io.open(filename, 'r')
     if file then
         fileContent = file:read('*all')
         file:close()
     else
-        fileContent = 'Íå óäàëîñü îòêðûòü ôàéë.'
+        fileContent = 'Error open file.'
     end
 end
 
@@ -60,7 +59,7 @@ local function readFile2(filename2)
         fileContent2 = file:read('*all')
         file:close()
     else
-        fileContent2 = 'Íå óäàëîñü îòêðûòü ôàéë.'
+        fileContent2 = 'Error open file.'
     end
 end
 
@@ -72,7 +71,7 @@ local function charArrayToString(array, length)
     local str = ''
     for i = 0, length do
         local char = string.char(array[i])
-        if char == '\0' then  -- Ïðåêðàùàåì, åñëè äîñòèãëè êîíöà ñòðîêè
+        if char == '\0' then
             break
         end
         str = str .. char
@@ -83,53 +82,53 @@ end
 imgui.OnFrame(function() return WinState[0] end, function(player)
     imgui.Begin('##Window', WinState, imgui.WindowFlags.NoScrollbar)
     if imgui.BeginTabBar('Tabs') then
-        if imgui.BeginTabItem(u8'Ìàøèíû') then
-            if imgui.Button(u8'Îòêðûòü ñïèñîê ìàøèí') then
-                imgui.OpenPopup(u8'Ñïèñîê ìàøèí')
+        if imgui.BeginTabItem(u8'Cars') then
+            if imgui.Button(u8'Open list Cars') then
+                imgui.OpenPopup(u8'List Cars')
             end
-            if imgui.BeginPopup(u8'Ñïèñîê ìàøèí') then
+            if imgui.BeginPopup(u8'List Cars') then
                 imgui.BeginChild(u8'FileContent', imgui.ImVec2(900, 700), true)
                 imgui.TextUnformatted(fileContent)
                 imgui.EndChild()
-                if imgui.Button(u8'Çàêðûòü', imgui.ImVec2(280, 24)) then
+                if imgui.Button(u8'Close', imgui.ImVec2(280, 24)) then
                     imgui.CloseCurrentPopup()
                 end
                 imgui.EndPopup()
             end
-            imgui.InputText(u8"Id ìàøèíû", inputField, 256)
-            if imgui.Button(u8"Ñîçäàòü ìàøèíó") then
+            imgui.InputText(u8"ID Car", inputField, 256)
+            if imgui.Button(u8"Create Car") then
                 local vehicleID = charArrayToString(inputField,256)
                 sampSendChat('/veh ' .. vehicleID .. ' 1 1')
             end
             imgui.SetCursorPos(imgui.ImVec2(130, 100.5))
-            if imgui.Button(u8"Óäàëèòü ìàøèíó") then
+            if imgui.Button(u8"Delete Car") then
                 sampSendChat('/adelveh')
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem(u8'Ñêèíû') then
-            if imgui.Button(u8'Îòêðûòü ñïèñîê ñêèíîâ') then
-                imgui.OpenPopup(u8'Ñïèñîê ñêèíîâ')
+        if imgui.BeginTabItem(u8'Skins') then
+            if imgui.Button(u8'Open list Skins') then
+                imgui.OpenPopup(u8'List Skins')
             end
-            if imgui.BeginPopup(u8'Ñïèñîê ñêèíîâ') then
+            if imgui.BeginPopup(u8'List Skins') then
                 imgui.BeginChild(u8'FileContent2', imgui.ImVec2(900, 700), true)
                 imgui.TextUnformatted(fileContent2)
                 imgui.EndChild()
-                if imgui.Button(u8'Çàêðûòü', imgui.ImVec2(280, 24)) then
+                if imgui.Button(u8'Close', imgui.ImVec2(280, 24)) then
                     imgui.CloseCurrentPopup()
                 end
                 imgui.EndPopup()
             end
-            imgui.InputText(u8"Id ñêèíà", inputField2, 256)
-            if imgui.Button(u8"Ñìåíèòü ñêèí") then
+            imgui.InputText(u8"ID Skin", inputField2, 256)
+            if imgui.Button(u8"Change Skin") then
                 local skinID = charArrayToString(inputField2,256)
                 sampSendChat('/skin ' .. skinID)
                 
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem(u8'Îñíîâíîå') then
-            if imgui.Button(u8'Ñïàâí') then
+        if imgui.BeginTabItem(u8'Main') then
+            if imgui.Button(u8'Spawn') then
                 local id = getCharModel(PLAYER_PED)
                 sampSendChat('/skin ' .. '1')
                 sampSpawnPlayer()
@@ -137,16 +136,16 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             if imgui.IsItemHovered() then
                 imgui.BeginTooltip()
-                imgui.Text(u8'Åñëè íå ïîìîãëî, òîãäà:')
-                imgui.Text(u8'1. Íà÷íèòå íàáëþäàòü çà êàêèì-òî èãðîêîì')
-                imgui.Text(u8'2. Çàòåì âûéäèòå èç ðåêîíà')
-                imgui.Text(u8'3. Íàæìèòå êíîïêó')
+                imgui.Text(u8'If not work:')
+                imgui.Text(u8'1. /re <random player>')
+                imgui.Text(u8'2. Leave /re')
+                imgui.Text(u8'3. Click Spawn')
                 imgui.EndTooltip()
             end
-            if imgui.Button(u8'Îáíîâëåíèå') then
+            if imgui.Button(u8'Update') then
                 update()
             end
-            if imgui.Button(u8'ahelp') then
+            if imgui.Button(u8'Test button') then
                 sampSendChat('/ahelp')
             end
         end
