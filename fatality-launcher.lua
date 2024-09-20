@@ -1,13 +1,12 @@
-script_version '2.6'
+script_version '2.8'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
 local encoding = require 'encoding'
-encoding.default = 'CP1251'
+encoding.default = 'UTF-8'
 local u8 = encoding.UTF8
 local new = imgui.new
 local dlstatus = require "moonloader".download_status
-local sampev = require 'samp.events'
 
 function update()
     local updatePath = os.getenv('TEMP')..'\\Update.json'
@@ -45,15 +44,6 @@ local inputField = new.char[256]()
 local inputField2 = new.char[256]()
 local messages = {}
 act = false
-
-function sampev.onServerMessage(color, text)
-    if text:find("Ответ от админа") and act then
-        table.insert(messages, u8(text))
-    end
-    if text:find("Ответ от саппорта") and act then
-        table.insert(messages, u8(text))
-    end
-end
 
 local function readFile(filename)
     local file = io.open(filename, 'r')
@@ -123,7 +113,8 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             imgui.SetCursorPos(imgui.ImVec2(70, 130.5))
             if imgui.Button("Flip Car") then
-                addToCarRotationVelocity(storeCarCharIsInNoSave(PLAYER_PED), 0.0, 5.1, 0.0)
+                veh = getCarCharIsUsing(PLAYER_PED)
+                setVehicleQuaternion(veh, 0, 0, 0, 0)
             end
             imgui.EndTabItem()
         end
@@ -166,13 +157,6 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             if imgui.Button('Update') then
                 update()
             end
-            if imgui.Button('Enable ChatLog') then
-                act = true
-            end
-            imgui.BeginChild("ChatLog", imgui.ImVec2(900, 700), true)      
-                for _, msg in ipairs(messages) do
-                    imgui.TextUnformatted(msg)
-                end
         end
         imgui.EndTabBar()
     end
