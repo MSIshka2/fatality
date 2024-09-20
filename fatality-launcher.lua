@@ -47,10 +47,10 @@ local messages = {}
 act = false
 
 function sampev.onServerMessage(color, text)
-    if text:find("Îòâåò îò àäìèíà") and act then
+    if text:find("Ответ от админа") and act then
         table.insert(messages, u8(text))
     end
-    if text:find("Îòâåò îò ñàïïîðòà") and act then
+    if text:find("Ответ от саппорта") and act then
         table.insert(messages, u8(text))
     end
 end
