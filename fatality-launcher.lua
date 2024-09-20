@@ -1,4 +1,4 @@
-script_version '2.4'
+script_version '2.5'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -47,10 +47,10 @@ local messages = {}
 act = false
 
 function sampev.onServerMessage(color, text)
-    if text:find("Ответ от админа") and act then
+    if text:find("ГЋГІГўГҐГІ Г®ГІ Г Г¤Г¬ГЁГ­Г ") and act then
         table.insert(messages, u8(text))
     end
-    if text:find("Ответ от саппорта") and act then
+    if text:find("ГЋГІГўГҐГІ Г®ГІ Г±Г ГЇГЇГ®Г°ГІГ ") and act then
         table.insert(messages, u8(text))
     end
 end
