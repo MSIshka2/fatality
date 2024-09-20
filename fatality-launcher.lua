@@ -1,11 +1,10 @@
-script_version '2.2'
+script_version '2.4'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
 local encoding = require 'encoding'
 encoding.default = 'CP1251'
-local u8 = encoding.UTF8
-local CP = encoding.CP1251
+local function u8d(s) return encoding.UTF8:decode(s) end
 local new = imgui.new
 local dlstatus = require "moonloader".download_status
 local sampev = require 'samp.events'
@@ -48,11 +47,11 @@ local messages = {}
 act = false
 
 function sampev.onServerMessage(color, text)
-    if text:find(CP"Ответ от админа") and act then
-        table.insert(messages, text)
+    if text:find(u8d"Ответ от админа") and act then
+        table.insert(messages, u8d(text))
     end
-    if text:find(CP"Ответ от админа") and act then
-        table.insert(messages, text)
+    if text:find(u8d"Ответ от саппорта") and act then
+        table.insert(messages, u8d(text))
     end
 end
 
@@ -95,62 +94,62 @@ end
 imgui.OnFrame(function() return WinState[0] end, function(player)
     imgui.Begin('##Window', WinState, imgui.WindowFlags.NoScrollbar)
     if imgui.BeginTabBar('Tabs') then
-        if imgui.BeginTabItem(u8'Cars') then
-            if imgui.Button(u8'Open list Cars') then
-                imgui.OpenPopup(u8'List Cars')
+        if imgui.BeginTabItem('Cars') then
+            if imgui.Button('Open list Cars') then
+                imgui.OpenPopup('List Cars')
             end
-            if imgui.BeginPopup(u8'List Cars') then
-                imgui.BeginChild(u8'FileContent', imgui.ImVec2(900, 700), true)
+            if imgui.BeginPopup('List Cars') then
+                imgui.BeginChild('FileContent', imgui.ImVec2(900, 700), true)
                 imgui.TextUnformatted(fileContent)
                 imgui.EndChild()
-                if imgui.Button(u8'Close', imgui.ImVec2(280, 24)) then
+                if imgui.Button('Close', imgui.ImVec2(280, 24)) then
                     imgui.CloseCurrentPopup()
                 end
                 imgui.EndPopup()
             end
-            imgui.InputText(u8"ID Car", inputField, 256)
-            if imgui.Button(u8"Create Car") then
+            imgui.InputText("ID Car", inputField, 256)
+            if imgui.Button("Create Car") then
                 local vehicleID = charArrayToString(inputField,256)
                 sampSendChat('/veh ' .. vehicleID .. ' 1 1')
             end
             imgui.SetCursorPos(imgui.ImVec2(90, 100.5))
-            if imgui.Button(u8"Delete Car") then
+            if imgui.Button("Delete Car") then
                 sampSendChat('/adelveh')
             end
             imgui.SetCursorPos(imgui.ImVec2(8, 130.5))
-            if imgui.Button(u8"Fix Car") then
+            if imgui.Button("Fix Car") then
                 local playerid = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
                 sampSendChat('/hp ' .. playerid )
             end
             imgui.SetCursorPos(imgui.ImVec2(70, 130.5))
-            if imgui.Button(u8"Flip Car") then
+            if imgui.Button("Flip Car") then
                 addToCarRotationVelocity(storeCarCharIsInNoSave(PLAYER_PED), 0.0, 5.1, 0.0)
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem(u8'Skins') then
-            if imgui.Button(u8'Open list Skins') then
-                imgui.OpenPopup(u8'List Skins')
+        if imgui.BeginTabItem('Skins') then
+            if imgui.Button('Open list Skins') then
+                imgui.OpenPopup('List Skins')
             end
-            if imgui.BeginPopup(u8'List Skins') then
-                imgui.BeginChild(u8'FileContent2', imgui.ImVec2(900, 700), true)
+            if imgui.BeginPopup('List Skins') then
+                imgui.BeginChild('FileContent2', imgui.ImVec2(900, 700), true)
                 imgui.TextUnformatted(fileContent2)
                 imgui.EndChild()
-                if imgui.Button(u8'Close', imgui.ImVec2(280, 24)) then
+                if imgui.Button('Close', imgui.ImVec2(280, 24)) then
                     imgui.CloseCurrentPopup()
                 end
                 imgui.EndPopup()
             end
-            imgui.InputText(u8"ID Skin", inputField2, 256)
-            if imgui.Button(u8"Change Skin") then
+            imgui.InputText("ID Skin", inputField2, 256)
+            if imgui.Button("Change Skin") then
                 local skinID = charArrayToString(inputField2,256)
                 sampSendChat('/skin ' .. skinID)
                 
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem(u8'Main') then
-            if imgui.Button(u8'Spawn') then
+        if imgui.BeginTabItem('Main') then
+            if imgui.Button('Spawn') then
                 local id = getCharModel(PLAYER_PED)
                 sampSendChat('/skin ' .. '1')
                 sampSpawnPlayer()
@@ -158,16 +157,16 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             if imgui.IsItemHovered() then
                 imgui.BeginTooltip()
-                imgui.Text(u8'If not work:')
-                imgui.Text(u8'1. /re <random player>')
-                imgui.Text(u8'2. Leave /re')
-                imgui.Text(u8'3. Click Spawn')
+                imgui.Text('If not work:')
+                imgui.Text('1. /re <random player>')
+                imgui.Text('2. Leave /re')
+                imgui.Text('3. Click Spawn')
                 imgui.EndTooltip()
             end
-            if imgui.Button(u8'Update') then
+            if imgui.Button('Update') then
                 update()
             end
-            if imgui.Button(u8'Enable ChatLog') then
+            if imgui.Button('Enable ChatLog') then
                 act = true
             end
             imgui.BeginChild("ChatLog", imgui.ImVec2(900, 700), true)      
