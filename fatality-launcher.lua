@@ -123,7 +123,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             imgui.SetCursorPos(imgui.ImVec2(70, 130.5))
             if imgui.Button(u8"Flip Car") then
-                addToCarRotationVelocity(storeCarCharIsInNoSave(PLAYER_PED), 0.0, 5, 0.0)
+                addToCarRotationVelocity(storeCarCharIsInNoSave(PLAYER_PED), 0.0, 5.1, 0.0)
             end
             imgui.EndTabItem()
         end
