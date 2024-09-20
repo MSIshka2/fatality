@@ -1,10 +1,11 @@
-script_version '2.0'
+script_version '2.1'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
 local encoding = require 'encoding'
 encoding.default = 'CP1251'
 local u8 = encoding.UTF8
+local CP = encoding.CP1251
 local new = imgui.new
 local dlstatus = require "moonloader".download_status
 local sampev = require 'samp.events'
@@ -47,10 +48,10 @@ local messages = {}
 act = false
 
 function sampev.onServerMessage(color, text)
-    if text:find(u8"Ответ от админа") and act then
+    if text:find(CP"Ответ от админа") and act then
         table.insert(messages, u8(text))
     end
-    if text:find(u8"Ответ от саппорта") and act then
+    if text:find(CP"Ответ от саппорта") and act then
         table.insert(messages, u8(text))
     end
 end
