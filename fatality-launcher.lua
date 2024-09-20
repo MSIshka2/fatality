@@ -1,4 +1,4 @@
-script_version '1.5'
+script_version '1.6'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -7,6 +7,7 @@ encoding.default = 'CP1251'
 local u8 = encoding.UTF8
 local new = imgui.new
 local dlstatus = require "moonloader".download_status
+local sampev = require 'samp.events'
 
 function update()
     local updatePath = os.getenv('TEMP')..'\\Update.json'
@@ -42,6 +43,17 @@ local fileContent = ''
 local fileContent2 = ''
 local inputField = new.char[256]()
 local inputField2 = new.char[256]()
+local messages = {}
+act = false
+
+function sampev.onServerMessage(color, text)
+    if text:find("Ответ от админа") and act then
+        table.insert(messages, u8(text))
+    end
+    if text:find("Ответ от саппорта") and act then
+        table.insert(messages, u8(text))
+    end
+end
 
 local function readFile(filename)
     local file = io.open(filename, 'r')
@@ -154,6 +166,13 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             if imgui.Button(u8'Update') then
                 update()
             end
+            if imgui.Button(u8'Enable ChatLog') then
+                act = true
+            end
+            imgui.BeginChild("ChatLog", imgui.ImVec2(900, 700), true)      
+                for _, msg in ipairs(messages) do
+                    imgui.TextUnformatted(msg)
+                end
         end
         imgui.EndTabBar()
     end
