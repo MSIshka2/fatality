@@ -1,4 +1,4 @@
-script_version '3.4'
+script_version '3.5'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -183,7 +183,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 act = true
                 imgui.BeginChild("ChatLog", imgui.ImVec2(500, 150), true)      
                 for _, msg in ipairs(messages) do
-                    imgui.TextUnformatted(msg)
+                    imgui.TextWrapped(msg)
                 end
             end
         end
