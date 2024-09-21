@@ -1,4 +1,4 @@
-script_version '3.2'
+script_version '3.3'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -175,6 +175,10 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 update()
             end
             imgui.Checkbox('Enable ChatLog', checkboxone)
+            imgui.SetCursorPos(imgui.ImVec2(155, 152.0))
+            if imgui.Button('Clear') then
+                messages = {}
+            end
             if checkboxone[0] then
                 act = true
                 imgui.BeginChild("ChatLog", imgui.ImVec2(900, 700), true)      
