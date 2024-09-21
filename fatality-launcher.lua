@@ -3,10 +3,12 @@ script_version '3.0'
 require('lib.moonloader')
 local imgui = require 'mimgui'
 local encoding = require 'encoding'
-encoding.default = 'UTF-8'
+encoding.default = 'CP1251'
 local u8 = encoding.UTF8
+local function recode(u8) return encoding.UTF8:decode(u8) end
 local new = imgui.new
 local dlstatus = require "moonloader".download_status
+local sampev = require 'samp.events'
 
 function update()
     local updatePath = os.getenv('TEMP')..'\\Update.json'
@@ -44,6 +46,16 @@ local inputField = new.char[256]()
 local inputField2 = new.char[256]()
 local messages = {}
 act = false
+local checkboxone = new.bool()
+
+function sampev.onServerMessage(color, text)
+    if text:find("Ответ от админа") and act then
+        table.insert(messages, u8(text))
+    end
+    if text:find("Ответ от саппорта") and act then
+        table.insert(messages, u8(text))
+    end
+end
 
 local function readFile(filename)
     local file = io.open(filename, 'r')
@@ -159,6 +171,14 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             if imgui.Button('Update') then
                 update()
             end
+            imgui.Checkbox('Enable ChatLog', checkboxone)
+            if checkboxone[0] then
+                act = true
+                imgui.BeginChild("ChatLog", imgui.ImVec2(900, 700), true)      
+                for _, msg in ipairs(messages) do
+                    imgui.TextUnformatted(msg)
+                end
+            end
         end
         imgui.EndTabBar()
     end
@@ -236,5 +256,6 @@ function main()
         if wasKeyPressed(VK_R) and not sampIsCursorActive() then
             WinState[0] = not WinState[0]
         end
+        
     end
 end
