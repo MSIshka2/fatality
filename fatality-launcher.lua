@@ -1,4 +1,4 @@
-script_version '3.5'
+script_version '3.6'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -48,6 +48,8 @@ local inputField2 = new.char[256]()
 local messages = {}
 act = false
 local checkboxone = new.bool()
+local checkx = imgui.new.float(500)
+local checky = imgui.new.float(150)
 
 function sampev.onServerMessage(color, text)
     if act then
@@ -179,13 +181,23 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             if imgui.Button('Clear') then
                 messages = {}
             end
+            imgui.SetCursorPos(imgui.ImVec2(205, 152.0))
+            if imgui.Button('Settings') then
+                imgui.OpenPopup('Settings')
+            end
+            if imgui.BeginPopup('Settings') then
+                imgui.SliderFloat('X', checkx, 1, 1000)
+                imgui.SliderFloat('Y', checky, 1, 1000)
+                imgui.EndPopup()
+            end
             if checkboxone[0] then
                 act = true
-                imgui.BeginChild("ChatLog", imgui.ImVec2(500, 150), true)      
+                imgui.BeginChild("ChatLog", imgui.ImVec2(checkx[0], checky[0]), true)      
                 for _, msg in ipairs(messages) do
                     imgui.TextWrapped(msg)
                 end
             end
+
         end
         imgui.EndTabBar()
     end
