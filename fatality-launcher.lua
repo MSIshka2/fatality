@@ -1,4 +1,4 @@
-script_version '3.6'
+script_version '3.7'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -188,6 +188,10 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             if imgui.BeginPopup('Settings') then
                 imgui.SliderFloat('X', checkx, 1, 1000)
                 imgui.SliderFloat('Y', checky, 1, 1000)
+                if imgui.Button('Reset') then
+                    checkx[0] = 500.000
+                    checky[0] = 150.000
+                end
                 imgui.EndPopup()
             end
             if checkboxone[0] then
