@@ -1,4 +1,4 @@
-script_version '4.0'
+script_version '4.1'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -97,6 +97,14 @@ local function charArrayToString(array, length)
     end
     return str
 end
+
+local function spawnPlayer()
+    local id = getCharModel(PLAYER_PED)
+    sampSendChat('/skin ' .. '1')
+    sampSpawnPlayer()
+    sampSendChat('/skin ' .. id)
+end
+
 imgui.OnInitialize(function()
     SoftBlueTheme()
 end)
@@ -160,10 +168,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
         end
         if imgui.BeginTabItem('Main') then
             if imgui.Button('Spawn') then
-                local id = getCharModel(PLAYER_PED)
-                sampSendChat('/skin ' .. '1')
-                sampSpawnPlayer()
-                sampSendChat('/skin ' .. id)
+                spawnPlayer()
             end
             if imgui.IsItemHovered() then
                 imgui.BeginTooltip()
