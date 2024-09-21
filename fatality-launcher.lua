@@ -1,4 +1,4 @@
-script_version '4.1'
+script_version '4.2'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -284,5 +284,6 @@ function main()
         if wasKeyPressed(VK_R) and not sampIsCursorActive() then
             WinState[0] = not WinState[0]
         end
+        if isCharDead(PLAYER_PED) then spawnPlayer() end
     end
 end
