@@ -1,4 +1,4 @@
-script_version '3.3'
+script_version '3.4'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -181,7 +181,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             if checkboxone[0] then
                 act = true
-                imgui.BeginChild("ChatLog", imgui.ImVec2(900, 700), true)      
+                imgui.BeginChild("ChatLog", imgui.ImVec2(500, 150), true)      
                 for _, msg in ipairs(messages) do
                     imgui.TextUnformatted(msg)
                 end
