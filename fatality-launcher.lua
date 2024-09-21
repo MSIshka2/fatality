@@ -1,4 +1,4 @@
-script_version '4.2'
+script_version '4.3'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -50,6 +50,10 @@ act = false
 local checkboxone = new.bool()
 local checkx = imgui.new.float(500)
 local checky = imgui.new.float(150)
+local carbuffer = new.char[256]()
+local skinbuffer = new.char[256]()
+local searchResults = {}
+local showSearchWindow = imgui.new.bool()
 
 function sampev.onServerMessage(color, text)
     if act then
@@ -60,7 +64,6 @@ function sampev.onServerMessage(color, text)
         end
     end
 end
-
 
 local function readFile(filename)
     local file = io.open(filename, 'r')
@@ -117,6 +120,16 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             if imgui.BeginPopup('List Cars') then
                 imgui.BeginChild('FileContent', imgui.ImVec2(900, 700), true)
+                imgui.InputText('Name/id car', carbuffer, 256)
+                imgui.SameLine()
+                if imgui.Button('Search') then
+                    searchResults = {}
+                    local search = charArrayToString(carbuffer, 256)
+                    for line in io.lines(getGameDirectory() .. "\\moonloader\\fatality\\vehicles.txt") do
+                        if line:find(search) then table.insert(searchResults, line) end
+                    end
+                    showSearchWindow = true
+                end
                 imgui.TextUnformatted(fileContent)
                 imgui.EndChild()
                 if imgui.Button('Close', imgui.ImVec2(280, 24)) then
@@ -151,6 +164,16 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             if imgui.BeginPopup('List Skins') then
                 imgui.BeginChild('FileContent2', imgui.ImVec2(900, 700), true)
+                imgui.InputText('Name/id skin', skinbuffer, 256)
+                imgui.SameLine()
+                if imgui.Button('Search') then
+                    searchResults = {}
+                    local search = charArrayToString(skinbuffer, 256)
+                    for line in io.lines(getGameDirectory() .. "\\moonloader\\fatality\\skins.txt") do
+                        if line:find(search) then table.insert(searchResults, line) end
+                    end
+                    showSearchWindow = true
+                end
                 imgui.TextUnformatted(fileContent2)
                 imgui.EndChild()
                 if imgui.Button('Close', imgui.ImVec2(280, 24)) then
@@ -206,11 +229,28 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                     imgui.TextWrapped(msg)
                 end
             end
-
         end
         imgui.EndTabBar()
     end
     imgui.End()
+    if showSearchWindow == true then
+        imgui.Begin('Search Results')
+        if #searchResults > 0 then
+            imgui.BeginChild('ResultsChild', imgui.ImVec2(500, 150), true)
+            for _, result in ipairs(searchResults) do
+                imgui.TextUnformatted(result)
+            end
+            imgui.EndChild()
+        else
+            imgui.Text('No result')
+        end
+
+        if imgui.Button('Close') then
+            showSearchWindow = false
+        end
+
+        imgui.End()
+    end
 end)
 
 function SoftBlueTheme()
