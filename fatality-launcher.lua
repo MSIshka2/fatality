@@ -1,10 +1,11 @@
-script_version '3.1'
+script_version '3.2'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
 local encoding = require 'encoding'
 encoding.default = 'CP1251'
 local u8 = encoding.UTF8
+local cp = encoding.CP1251
 local function recode(u8) return encoding.UTF8:decode(u8) end
 local new = imgui.new
 local dlstatus = require "moonloader".download_status
@@ -49,13 +50,15 @@ act = false
 local checkboxone = new.bool()
 
 function sampev.onServerMessage(color, text)
-    if text:find("Ответ от админа") and act then
-        table.insert(messages, u8(text))
-    end
-    if text:find("Ответ от саппорта") and act then
-        table.insert(messages, u8(text))
+    if act then
+        local playerid2 = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
+        local name = sampGetPlayerNickname(playerid2)
+        if text:find("<%s*.-%s*" .. name ) then
+            table.insert(messages, u8(text))
+        end
     end
 end
+
 
 local function readFile(filename)
     local file = io.open(filename, 'r')
