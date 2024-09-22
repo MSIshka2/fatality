@@ -1,4 +1,4 @@
-script_version '4.5'
+script_version '4.6'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -281,6 +281,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                     imgui.TextWrapped(msg)
                 end
             end
+            imgui.EndTabItem()
         end
         if imgui.BeginTabItem('Favorites') then
             imgui.BeginChild('FavoritesChild', imgui.ImVec2(900, 700), true)
@@ -312,10 +313,8 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.EndChild()
                 imgui.EndPopup()
             end
-        
-            imgui.EndChild()
             imgui.EndTabItem()
-        
+            imgui.EndChild()
         end
 
         imgui.EndTabBar()
