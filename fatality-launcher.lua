@@ -285,7 +285,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
         if imgui.BeginTabItem('Favorites') then
             imgui.BeginChild('FavoritesChild', imgui.ImVec2(900, 700), true)
         
-            if imgui.Button('Открыть избранные автомобили') then
+            if imgui.Button('Open favorites cars') then
                 imgui.OpenPopup('Favorites Car')
             end
             if imgui.BeginPopup('Favorites Car') then
@@ -299,7 +299,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.EndPopup()
             end
         
-            if imgui.Button('Открыть избранные скины') then
+            if imgui.Button('Open favorites skins ') then
                 imgui.OpenPopup('Favorites Skins')
             end
             if imgui.BeginPopup('Favorites Skins') then
