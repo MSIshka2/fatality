@@ -1,4 +1,4 @@
-script_version '4.4'
+script_version '4.5'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -43,6 +43,8 @@ end
 local WinState = new.bool()
 local fileContent = ''
 local fileContent2 = ''
+local fileContent3 = ''
+local fileContent4 = ''
 local inputField = new.char[256]()
 local inputField2 = new.char[256]()
 local messages = {}
@@ -57,6 +59,8 @@ local showSearchWindow = imgui.new.bool()
 local selectedText = ""
 local isSelecting = false
 local startIdx, endIdx = nil, nil
+local favoritesVehicles = {}
+local favoritesSkins = {}
 
 function sampev.onServerMessage(color, text)
     if act then
@@ -88,9 +92,42 @@ local function readFile2(filename2)
     end
 end
 
+local function writeToFile(filename, data)
+    local file = io.open(filename, 'a')
+    if file then
+        for _, entry in ipairs(data) do
+            file:write(entry .. "\n")
+        end
+        file:close()
+    end
+end
+
+local function readFile3()
+    local vehicleFile = getGameDirectory() .. "\\moonloader\\fatality\\favoritescar.txt"
+        local file = io.open(vehicleFile, 'r')
+        if file then
+            fileContent3 = file:read('*all')
+            file:close()
+        else
+            fileContent3 = 'Error open file.'
+        end
+end
+local function readFile4()
+    local skinFile = getGameDirectory() .. "\\moonloader\\fatality\\favoritesskin.txt"
+        local file = io.open(skinFile, 'r')
+        if file then
+            fileContent4 = file:read('*all')
+            file:close()
+        else
+            fileContent4 = 'Error open file.'
+        end
+end
+
 local moonloaderPath = getGameDirectory() .. '\\moonloader\\'
 readFile(moonloaderPath .. 'fatality\\vehicles.txt')
 readFile2(moonloaderPath .. 'fatality\\skins.txt')
+readFile3(moonloaderPath .. 'fatality\\favoritescar.txt')
+readFile4(moonloaderPath .. 'fatality\\favoritesskin.txt')
 
 local function charArrayToString(array, length)
     local str = ''
@@ -120,6 +157,12 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
         if imgui.BeginTabItem('Cars') then
             if imgui.Button('Open list Cars') then
                 imgui.OpenPopup('List Cars')
+            end
+            imgui.SameLine()
+            if imgui.Button("Add to Favorites") then
+                local vehicleID = charArrayToString(inputField, 256)
+                table.insert(favoritesVehicles, vehicleID)
+                writeToFile(getGameDirectory() .. "\\moonloader\\fatality\\favoritescar.txt", {vehicleID})
             end
             if imgui.BeginPopup('List Cars') then
                 imgui.BeginChild('FileContent', imgui.ImVec2(900, 700), true)
@@ -164,6 +207,12 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
         if imgui.BeginTabItem('Skins') then
             if imgui.Button('Open list Skins') then
                 imgui.OpenPopup('List Skins')
+            end
+            imgui.SameLine()
+            if imgui.Button("Add to Favorites") then
+                local skinID = charArrayToString(inputField2, 256)
+                table.insert(favoritesSkins, skinID)
+                writeToFile(getGameDirectory() .. "\\moonloader\\fatality\\favoritesskin.txt", {skinID})
             end
             if imgui.BeginPopup('List Skins') then
                 imgui.BeginChild('FileContent2', imgui.ImVec2(900, 700), true)
@@ -233,6 +282,42 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 end
             end
         end
+        if imgui.BeginTabItem('Favorites') then
+            imgui.BeginChild('FavoritesChild', imgui.ImVec2(900, 700), true)
+        
+            if imgui.Button('Открыть избранные автомобили') then
+                imgui.OpenPopup('Favorites Car')
+            end
+            if imgui.BeginPopup('Favorites Car') then
+                imgui.BeginChild('FileContent3', imgui.ImVec2(400, 300), true)
+                imgui.TextUnformatted(fileContent3)
+                imgui.EndChild()
+                if imgui.Button('Close', imgui.ImVec2(280, 24)) then
+                    imgui.CloseCurrentPopup()
+                end
+            
+                imgui.EndPopup()
+            end
+        
+            if imgui.Button('Открыть избранные скины') then
+                imgui.OpenPopup('Favorites Skins')
+            end
+            if imgui.BeginPopup('Favorites Skins') then
+                imgui.BeginChild('FileContent4', imgui.ImVec2(400, 300), true)
+                imgui.TextUnformatted(fileContent4)
+                imgui.EndChild()
+                if imgui.Button('Close', imgui.ImVec2(280, 24)) then
+                    imgui.CloseCurrentPopup()
+                end
+                imgui.EndChild()
+                imgui.EndPopup()
+            end
+        
+            imgui.EndChild()
+            imgui.EndTabItem()
+        
+        end
+
         imgui.EndTabBar()
     end
     imgui.End()
@@ -328,7 +413,6 @@ function SoftBlueTheme()
     style.Colors[imgui.Col.TabHovered]             = imgui.ImVec4(0.60, 0.60, 0.90, 1.00)
     style.Colors[imgui.Col.TabActive]              = imgui.ImVec4(0.28, 0.56, 0.96, 1.00)
 end
-
 
 function main()
     while true do
