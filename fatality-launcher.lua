@@ -1,4 +1,4 @@
-script_version '4.3'
+script_version '4.4'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -54,6 +54,9 @@ local carbuffer = new.char[256]()
 local skinbuffer = new.char[256]()
 local searchResults = {}
 local showSearchWindow = imgui.new.bool()
+local selectedText = ""
+local isSelecting = false
+local startIdx, endIdx = nil, nil
 
 function sampev.onServerMessage(color, text)
     if act then
@@ -237,10 +240,19 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
         imgui.Begin('Search Results')
         if #searchResults > 0 then
             imgui.BeginChild('ResultsChild', imgui.ImVec2(500, 150), true)
-            for _, result in ipairs(searchResults) do
-                imgui.TextUnformatted(result)
+            for idx, result in ipairs(searchResults) do
+                if imgui.Selectable(result, selectedIndex == idx) then
+                    selectedIndex = idx
+                    local id = result:match("^(%d+)")
+                    selectedText = id
+                end
             end
             imgui.EndChild()
+            if imgui.Button('Copy Selected') then
+                if selectedText ~= "" then
+                    imgui.SetClipboardText(selectedText)
+                end
+            end
         else
             imgui.Text('No result')
         end
