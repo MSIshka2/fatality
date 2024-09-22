@@ -1,4 +1,4 @@
-script_version '4.7'
+script_version '4.8'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -292,6 +292,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 for _, msg in ipairs(messages) do
                     imgui.TextWrapped(msg)
                 end
+                imgui.EndPopup()
             end
             imgui.EndTabItem()
         end
