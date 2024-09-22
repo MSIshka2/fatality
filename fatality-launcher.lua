@@ -1,4 +1,4 @@
-script_version '4.6'
+script_version '4.7'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -61,6 +61,8 @@ local isSelecting = false
 local startIdx, endIdx = nil, nil
 local favoritesVehicles = {}
 local favoritesSkins = {}
+local inputa1 = new.char[256]()
+local inputa2 = new.char[256]()
 
 function sampev.onServerMessage(color, text)
     if act then
@@ -239,6 +241,16 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 sampSendChat('/skin ' .. skinID)
                 
             end
+            imgui.PushItemWidth(30)
+            imgui.InputText('1 aks', inputa1, 10)
+            imgui.PushItemWidth(30)
+            imgui.InputText('2 aks', inputa2, 10)
+            if imgui.Button('Apply') then
+                local aksID = charArrayToString(inputa1,256)
+                local aksID2 = charArrayToString(inputa2,256)
+                sampSendChat('/launcher ' .. aksID)
+                sampSendChat('/launcher ' .. aksID2)
+            end
             imgui.EndTabItem()
         end
         if imgui.BeginTabItem('Main') then
@@ -284,7 +296,6 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             imgui.EndTabItem()
         end
         if imgui.BeginTabItem('Favorites') then
-            imgui.BeginChild('FavoritesChild', imgui.ImVec2(900, 700), true)
         
             if imgui.Button('Open favorites cars') then
                 imgui.OpenPopup('Favorites Car')
@@ -314,7 +325,6 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.EndPopup()
             end
             imgui.EndTabItem()
-            imgui.EndChild()
         end
 
         imgui.EndTabBar()
