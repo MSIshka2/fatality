@@ -1,4 +1,4 @@
-script_version '4.8'
+script_version '4.9'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -308,7 +308,9 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 if imgui.Button('Close', imgui.ImVec2(280, 24)) then
                     imgui.CloseCurrentPopup()
                 end
-            
+            if imgui.Button('Тест кнопка') then
+                        sampSendChat('/ahelp')
+            end
                 imgui.EndPopup()
             end
         
