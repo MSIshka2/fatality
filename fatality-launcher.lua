@@ -33,7 +33,7 @@ function update()
                         end)
                     end)
                 else
-                    sampAddChatMessage((u8:decode('[Testing]: У вас и так последняя версия! Обновление отменено')), 0xFFFFFF)
+                    sampAddChatMessage((u8:decode('[Update]: У вас и так последняя версия! Обновление отменено')), 0xFFFFFF)
                 end
             end
         end
