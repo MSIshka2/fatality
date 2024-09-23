@@ -276,11 +276,11 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                     imgui.TextWrapped(msg)
                 end
                 imgui.EndPopup()
-                imgui.SetCursorPos(imgui.ImVec2(30, 305.0))
+                imgui.SetCursorPos(imgui.ImVec2(15, 305.0))
             if imgui.Button('Очистить') then
                 messages = {}
             end
-            imgui.SetCursorPos(imgui.ImVec2(108, 305.0))
+            imgui.SetCursorPos(imgui.ImVec2(92, 305.0))
             if imgui.Button('Настройки') then
                 imgui.OpenPopup('Settings')
             end
