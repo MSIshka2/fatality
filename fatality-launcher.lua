@@ -1,4 +1,4 @@
-script_version("5.9")
+script_version("6.0")
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -280,7 +280,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             if imgui.Button('Очистить') then
                 messages = {}
             end
-            imgui.SetCursorPos(imgui.ImVec2(92, 305.0))
+            imgui.SetCursorPos(imgui.ImVec2(93, 305.0))
             if imgui.Button('Настройки') then
                 imgui.OpenPopup('Settings')
             end
