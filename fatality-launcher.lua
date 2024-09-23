@@ -1,4 +1,4 @@
-script_version '5.4'
+script_version '5.5'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -330,7 +330,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
     end
     imgui.End()
     if showSearchWindow == true then
-        imgui.Begin('Search Results')
+        imgui.Begin('Найденное')
         if #searchResults > 0 then
             imgui.BeginChild('ResultsChild', imgui.ImVec2(500, 150), true)
             for idx, result in ipairs(searchResults) do
@@ -341,32 +341,18 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 end
             end
             imgui.EndChild()
-            if imgui.Button('Copy Selected') then
+            if imgui.Button('Копировать выделенное') then
                 if selectedText ~= "" then
                     imgui.SetClipboardText(selectedText)
                 end
             end
         else
-            imgui.Text('No result')
+            imgui.Text('Нет результата')
         end
 
-        if imgui.Button('Close') then
+        if imgui.Button('Закрыть') then
             showSearchWindow = false
         end
-        imgui.SetCursorPos(imgui.ImVec2(sizeX  - 87, 65)) -- Убрал строчку выше, объединил размер звёзд (77 пикселей по x) с отступом в 10 пикселей
-        imgui.PushStyleColor(imgui.Col.Text, imgui.ImVec4(ini.wanted_text.r, ini.wanted_text.g, ini.wanted_text.b, ini.wanted_text.a))
-        wanted = memory.getuint8(0x58DB60)
-        imgui.PushStyleVar(imgui.StyleVar.ItemSpacing, imgui.ImVec2(1, 0)) -- чтобы звёзды были впритык
-        for i = 1, 6 do
-            if wanted >= i then
-                imgui.Text(fa.ICON_STAR)
-            else
-                imgui.Text(fa.ICON_STAR_O)
-            end
-    imgui.SameLine()
-end
-imgui.PopStyleVar()
-imgui.PopStyleColor()
         imgui.End()
     end
 end)
