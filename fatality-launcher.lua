@@ -1,4 +1,4 @@
-script_version '5.1'
+script_version '5.2'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -10,6 +10,7 @@ local function recode(u8) return encoding.UTF8:decode(u8) end
 local new = imgui.new
 local dlstatus = require "moonloader".download_status
 local sampev = require 'samp.events'
+
 
 function update()
     local updatePath = os.getenv('TEMP')..'\\Update.json'
@@ -48,7 +49,7 @@ local fileContent4 = ''
 local inputField = new.char[256]()
 local inputField2 = new.char[256]()
 local messages = {}
-act = false
+local act = true
 local checkboxone = new.bool()
 local checkx = imgui.new.float(500)
 local checky = imgui.new.float(150)
@@ -63,6 +64,8 @@ local favoritesVehicles = {}
 local favoritesSkins = {}
 local inputa1 = new.char[256]()
 local inputa2 = new.char[256]()
+local Font = renderCreateFont('Arial', 15, 0)
+local activation = new.bool()
 
 function sampev.onServerMessage(color, text)
     if act then
@@ -268,12 +271,16 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             if imgui.Button('Обновить') then
                 update()
             end
-            imgui.Checkbox('Включить ChatLog', checkboxone)
-            imgui.SetCursorPos(imgui.ImVec2(175, 152.0))
+                imgui.BeginChild("ChatLog", imgui.ImVec2(checkx[0], checky[0]), true)      
+                for _, msg in ipairs(messages) do
+                    imgui.TextWrapped(msg)
+                end
+                imgui.EndPopup()
+                imgui.SetCursorPos(imgui.ImVec2(30, 305.0))
             if imgui.Button('Очистить') then
                 messages = {}
             end
-            imgui.SetCursorPos(imgui.ImVec2(255, 152.0))
+            imgui.SetCursorPos(imgui.ImVec2(110, 305.0))
             if imgui.Button('Настройки') then
                 imgui.OpenPopup('Settings')
             end
@@ -283,14 +290,6 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 if imgui.Button('Reset') then
                     checkx[0] = 500.000
                     checky[0] = 150.000
-                end
-                imgui.EndPopup()
-            end
-            if checkboxone[0] then
-                act = true
-                imgui.BeginChild("ChatLog", imgui.ImVec2(checkx[0], checky[0]), true)      
-                for _, msg in ipairs(messages) do
-                    imgui.TextWrapped(msg)
                 end
                 imgui.EndPopup()
             end
@@ -354,7 +353,20 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
         if imgui.Button('Close') then
             showSearchWindow = false
         end
-
+        imgui.SetCursorPos(imgui.ImVec2(sizeX  - 87, 65)) -- Убрал строчку выше, объединил размер звёзд (77 пикселей по x) с отступом в 10 пикселей
+        imgui.PushStyleColor(imgui.Col.Text, imgui.ImVec4(ini.wanted_text.r, ini.wanted_text.g, ini.wanted_text.b, ini.wanted_text.a))
+        wanted = memory.getuint8(0x58DB60)
+        imgui.PushStyleVar(imgui.StyleVar.ItemSpacing, imgui.ImVec2(1, 0)) -- чтобы звёзды были впритык
+        for i = 1, 6 do
+            if wanted >= i then
+                imgui.Text(fa.ICON_STAR)
+            else
+                imgui.Text(fa.ICON_STAR_O)
+            end
+    imgui.SameLine()
+end
+imgui.PopStyleVar()
+imgui.PopStyleColor()
         imgui.End()
     end
 end)
