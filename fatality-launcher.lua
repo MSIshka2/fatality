@@ -1,4 +1,4 @@
-script_version '4.9'
+script_version '5.0'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -156,12 +156,12 @@ end)
 imgui.OnFrame(function() return WinState[0] end, function(player)
     imgui.Begin('##Window', WinState, imgui.WindowFlags.NoScrollbar)
     if imgui.BeginTabBar('Tabs') then
-        if imgui.BeginTabItem('Cars') then
-            if imgui.Button('Open list Cars') then
+        if imgui.BeginTabItem('Машины') then
+            if imgui.Button('Открыть список машин') then
                 imgui.OpenPopup('List Cars')
             end
             imgui.SameLine()
-            if imgui.Button("Add to Favorites") then
+            if imgui.Button("Добавить в избранное") then
                 local vehicleID = charArrayToString(inputField, 256)
                 table.insert(favoritesVehicles, vehicleID)
                 writeToFile(getGameDirectory() .. "\\moonloader\\fatality\\favoritescar.txt", {vehicleID})
@@ -170,7 +170,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.BeginChild('FileContent', imgui.ImVec2(900, 700), true)
                 imgui.InputText('Name/id car', carbuffer, 256)
                 imgui.SameLine()
-                if imgui.Button('Search') then
+                if imgui.Button('Поиск') then
                     searchResults = {}
                     local search = charArrayToString(carbuffer, 256)
                     for line in io.lines(getGameDirectory() .. "\\moonloader\\fatality\\vehicles.txt") do
@@ -180,47 +180,47 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 end
                 imgui.TextUnformatted(fileContent)
                 imgui.EndChild()
-                if imgui.Button('Close', imgui.ImVec2(280, 24)) then
+                if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
                     imgui.CloseCurrentPopup()
                 end
                 imgui.EndPopup()
             end
-            imgui.InputText("ID Car", inputField, 256)
-            if imgui.Button("Create Car") then
+            imgui.InputText("ID машины", inputField, 256)
+            if imgui.Button("Создать машину") then
                 local vehicleID = charArrayToString(inputField,256)
                 sampSendChat('/veh ' .. vehicleID .. ' 1 1')
             end
             imgui.SetCursorPos(imgui.ImVec2(96, 151.0))
-            if imgui.Button("Delete Car") then
+            if imgui.Button("Удалить машину") then
                 sampSendChat('/adelveh')
             end
             imgui.SetCursorPos(imgui.ImVec2(15, 182.0))
-            if imgui.Button("Fix Car") then
+            if imgui.Button("Починить машину") then
                 local playerid = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
                 sampSendChat('/hp ' .. playerid )
             end
             imgui.SetCursorPos(imgui.ImVec2(75, 182.0))
-            if imgui.Button("Flip Car") then
+            if imgui.Button("Перевернуть машину") then
                 veh = getCarCharIsUsing(PLAYER_PED)
                 setVehicleQuaternion(veh, 0, 0, 0, 0)
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Skins') then
-            if imgui.Button('Open list Skins') then
+        if imgui.BeginTabItem('Скины') then
+            if imgui.Button('Открыть список скинов') then
                 imgui.OpenPopup('List Skins')
             end
             imgui.SameLine()
-            if imgui.Button("Add to Favorites") then
+            if imgui.Button("Добавить в избранное") then
                 local skinID = charArrayToString(inputField2, 256)
                 table.insert(favoritesSkins, skinID)
                 writeToFile(getGameDirectory() .. "\\moonloader\\fatality\\favoritesskin.txt", {skinID})
             end
             if imgui.BeginPopup('List Skins') then
                 imgui.BeginChild('FileContent2', imgui.ImVec2(900, 700), true)
-                imgui.InputText('Name/id skin', skinbuffer, 256)
+                imgui.InputText('Название/ID скина', skinbuffer, 256)
                 imgui.SameLine()
-                if imgui.Button('Search') then
+                if imgui.Button('Поиск') then
                     searchResults = {}
                     local search = charArrayToString(skinbuffer, 256)
                     for line in io.lines(getGameDirectory() .. "\\moonloader\\fatality\\skins.txt") do
@@ -235,17 +235,17 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 end
                 imgui.EndPopup()
             end
-            imgui.InputText("ID Skin", inputField2, 256)
-            if imgui.Button("Change Skin") then
+            imgui.InputText("ID скина", inputField2, 256)
+            if imgui.Button("Сменить скин") then
                 local skinID = charArrayToString(inputField2,256)
                 sampSendChat('/skin ' .. skinID)
                 
             end
             imgui.PushItemWidth(30)
-            imgui.InputText('1 aks', inputa1, 10)
+            imgui.InputText('1 акс', inputa1, 10)
             imgui.PushItemWidth(30)
-            imgui.InputText('2 aks', inputa2, 10)
-            if imgui.Button('Apply') then
+            imgui.InputText('2 акс', inputa2, 10)
+            if imgui.Button('Применить') then
                 local aksID = charArrayToString(inputa1,256)
                 local aksID2 = charArrayToString(inputa2,256)
                 sampSendChat('/launcher ' .. aksID)
@@ -253,28 +253,28 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Main') then
-            if imgui.Button('Spawn') then
+        if imgui.BeginTabItem('Основное') then
+            if imgui.Button('Спавн') then
                 spawnPlayer()
             end
             if imgui.IsItemHovered() then
                 imgui.BeginTooltip()
-                imgui.Text('If not work:')
-                imgui.Text('1. /re <random player>')
-                imgui.Text('2. Leave /re')
-                imgui.Text('3. Click Spawn')
+                imgui.Text('Если не работает:')
+                imgui.Text('1. /re <любой игрок>')
+                imgui.Text('2. Выйдите из /re')
+                imgui.Text('3. Нажмите кнопку спавна')
                 imgui.EndTooltip()
             end
-            if imgui.Button('Update') then
+            if imgui.Button('Обновить') then
                 update()
             end
-            imgui.Checkbox('Enable ChatLog', checkboxone)
+            imgui.Checkbox('Включить ChatLog', checkboxone)
             imgui.SetCursorPos(imgui.ImVec2(155, 152.0))
-            if imgui.Button('Clear') then
+            if imgui.Button('Очистить') then
                 messages = {}
             end
             imgui.SetCursorPos(imgui.ImVec2(205, 152.0))
-            if imgui.Button('Settings') then
+            if imgui.Button('Настройки') then
                 imgui.OpenPopup('Settings')
             end
             if imgui.BeginPopup('Settings') then
@@ -296,32 +296,29 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Favorites') then
+        if imgui.BeginTabItem('Избранное') then
         
-            if imgui.Button('Open favorites cars') then
+            if imgui.Button('Открыть избранные машины') then
                 imgui.OpenPopup('Favorites Car')
             end
             if imgui.BeginPopup('Favorites Car') then
                 imgui.BeginChild('FileContent3', imgui.ImVec2(400, 300), true)
                 imgui.TextUnformatted(fileContent3)
                 imgui.EndChild()
-                if imgui.Button('Close', imgui.ImVec2(280, 24)) then
+                if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
                     imgui.CloseCurrentPopup()
                 end
-            if imgui.Button('Тест кнопка') then
-                        sampSendChat('/ahelp')
-            end
                 imgui.EndPopup()
             end
         
-            if imgui.Button('Open favorites skins ') then
+            if imgui.Button('Открыть избранные скины') then
                 imgui.OpenPopup('Favorites Skins')
             end
             if imgui.BeginPopup('Favorites Skins') then
                 imgui.BeginChild('FileContent4', imgui.ImVec2(400, 300), true)
                 imgui.TextUnformatted(fileContent4)
                 imgui.EndChild()
-                if imgui.Button('Close', imgui.ImVec2(280, 24)) then
+                if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
                     imgui.CloseCurrentPopup()
                 end
                 imgui.EndChild()
