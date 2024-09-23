@@ -15,7 +15,7 @@ local sampev = require 'samp.events'
 function update()
     local updatePath = os.getenv('TEMP')..'\\Update.json'
     sampAddChatMessage((u8:decode('[Update]: Поиск обновления')), 0xFFFFFF)
-    downloadUrlToFile("https://raw.githubusercontent.com/MSIshka2/fatality/main/fatality.json?", updatePath, function(id, status, p1, p2)
+    downloadUrlToFile("https://raw.githubusercontent.com/MSIshka2/fatality/main/fatality.json", updatePath, function(id, status, p1, p2)
         if status == dlstatus.STATUS_ENDDOWNLOADDATA then
             local file = io.open(updatePath, 'r')
             if file and doesFileExist(updatePath) then
@@ -25,7 +25,7 @@ function update()
                     lua_thread.create(function()
                         wait(2000)
                         sampAddChatMessage((u8:decode('[Update]: Идёт обновление')), 0xFFFFFF)
-                        downloadUrlToFile("https://raw.githubusercontent.com/MSIshka2/fatality/main/fatality-launcher.lua?", thisScript().path, function(id, status, p1, p2)
+                        downloadUrlToFile("https://raw.githubusercontent.com/MSIshka2/fatality/refs/heads/main/fatality-launcher.lua", thisScript().path, function(id, status, p1, p2)
                             if status == dlstatus.STATUS_ENDDOWNLOADDATA then
                                 sampAddChatMessage((u8:decode('[Update]: Обновление установлено')), 0xFFFFFF)
                                 thisScript():reload()
