@@ -1,4 +1,4 @@
-script_version '5.0'
+script_version '5.1'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -168,7 +168,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             if imgui.BeginPopup('List Cars') then
                 imgui.BeginChild('FileContent', imgui.ImVec2(900, 700), true)
-                imgui.InputText('Name/id car', carbuffer, 256)
+                imgui.InputText('Название/ID машины', carbuffer, 256)
                 imgui.SameLine()
                 if imgui.Button('Поиск') then
                     searchResults = {}
@@ -190,7 +190,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 local vehicleID = charArrayToString(inputField,256)
                 sampSendChat('/veh ' .. vehicleID .. ' 1 1')
             end
-            imgui.SetCursorPos(imgui.ImVec2(96, 151.0))
+            imgui.SetCursorPos(imgui.ImVec2(135, 151.0))
             if imgui.Button("Удалить машину") then
                 sampSendChat('/adelveh')
             end
@@ -199,7 +199,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 local playerid = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
                 sampSendChat('/hp ' .. playerid )
             end
-            imgui.SetCursorPos(imgui.ImVec2(75, 182.0))
+            imgui.SetCursorPos(imgui.ImVec2(143, 182.0))
             if imgui.Button("Перевернуть машину") then
                 veh = getCarCharIsUsing(PLAYER_PED)
                 setVehicleQuaternion(veh, 0, 0, 0, 0)
@@ -269,11 +269,11 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 update()
             end
             imgui.Checkbox('Включить ChatLog', checkboxone)
-            imgui.SetCursorPos(imgui.ImVec2(155, 152.0))
+            imgui.SetCursorPos(imgui.ImVec2(175, 152.0))
             if imgui.Button('Очистить') then
                 messages = {}
             end
-            imgui.SetCursorPos(imgui.ImVec2(205, 152.0))
+            imgui.SetCursorPos(imgui.ImVec2(255, 152.0))
             if imgui.Button('Настройки') then
                 imgui.OpenPopup('Settings')
             end
