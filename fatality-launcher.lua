@@ -268,7 +268,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.Text('3. Нажмите кнопку спавна')
                 imgui.EndTooltip()
             end
-            if imgui.Button('Обновить') then
+            if imgui.Button('Обновить скрипт') then
                 update()
             end
                 imgui.BeginChild("ChatLog", imgui.ImVec2(checkx[0], checky[0]), true)      
