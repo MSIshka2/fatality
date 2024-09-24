@@ -1,4 +1,4 @@
-script_version '1.0.2'
+script_version '1.0.3'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -66,6 +66,97 @@ local inputa1 = new.char[256]()
 local inputa2 = new.char[256]()
 local Font = renderCreateFont('Arial', 15, 0)
 local activation = new.bool()
+local aclLevel = 3
+local password = new.char[256]()
+local enterpassword = "1111"
+local dostup = new.bool()
+
+local commands1 = {
+    "/atops - Рейтинг основателей",
+    "/zpanel - Панель админа(все функции доступны)",
+    "/ripmans - Список игроков в RIP",
+    "/rconsay - RCON чат",
+    "/offgivedonate - Выдать донат очки оффлайн",
+    "/offalvladmin - Выдать админку оффлайн",
+    "/caseon - Вкл кейсы/подарки",
+    "/caseoff - Выкл кейсы/подарки",
+    "/ratingon - Вкл рейтинги",
+    "/ratingoff - Выкл рейтинги",
+    "/ablow - Покупка салюта",
+    "/agiverub - Выдача рублей",
+    "/mpwin - Огласить победителя",
+    "/tps - Новое телепорт-меню",
+    "/apanel - Панель основателя",
+    "/dostup - Выдать fd1",
+    "/undostup - Снять fd1",
+    "/glava - Выдать 16 lvl",
+    "/unglava - Снять 16 lvl",
+    "/delvipcase - Удалить кейс",
+    "/givecmd - Выдача команд",
+    "/setminigun - Разрешение на миниган",
+    "/farmer - Поставить ограничение",
+    "/unfarmer - Снять ограничение",
+    "/akkreset - Аннулировать все донат очки",
+    "/unbanall - Разбанить всех игроков",
+    "/unconpens - Разрешить повторный ввод компенсации и промокодов"
+}
+local commands2 = {
+    "/antierror - Снять ошибку безопасности",
+    "/offawarn - Выдать оффлайн выговор",
+    "/podarok - Открыть НГ подарок",
+    "/aban - Бан навсегда",
+    "/offleader - Убрать лидера",
+    "/amute - Админ-затычка",
+    "/look - Вид от 1 лица (в ТС)",
+    "/neon - Неон на домашний ТС",
+    "/jetpack - Получить ранец",
+    "/ahostname - Изменить название сервера",
+    "/apassword - Изменить пароль сервера",
+    "/ops - Режим тех. работ",
+    "/asban - Тихий бан навсегда",
+    "/iban - Бан навсегда 2",
+    "/sban - Тихий бан",
+    "/offgiverub - Выдача рублей оффлайн",
+    "/offgivestars - Выдача баллов оффлайн",
+    "/onprom - Разрешить ввод промокодов",
+    "/offleaders - Оффлайн лидеры",
+    "/geton - Последний заход игрока",
+    "/cuff - Надеть наручники",
+    "/aclub - Все пункты доступны",
+    "/setquest - Управление квестом у игрока",
+    "/aquest - Вкл/выкл квест у игрока",
+    "/clubload - Загрузка клубов",
+    "/atext - Сделать важное объявление",
+    "/title - Выдача титулов",
+    "/giveclist - Выдать радужный клист",
+    "/giveguns - Выдать набор цветов на оружия",
+    "/givepay - Выдать команды /rpay /dpay",
+    "/givedice - Выдать команды /rdice /ddice",
+    "/holkinacc - Удалить аккаунт",
+    "/getakk - Посмотреть пароль игрока",
+    "/osnova - Выдача основателя",
+    "/unosnova - Снятие основателя",
+}
+local commands3 = {
+    "/setpass - Сменить пароль игрока",
+    "/atp - Принудительно телепортировать всех к себе",
+    "/aconnect - Видеть чат, смс, ввод комманд",
+    "/ajoin - Вкл/выкл /mp /givegun /agivegun /sethp /asethp /slap",
+    "/amenu - Панель статистики",
+    "/atitle - Проверить титул у игрока",
+    "/ahack - Отнять деньги, деньги в банке, дом, бизнес, азс",
+    "/people - Показать топ по разным типам",
+    "/block - Заблокировать/разблокировать ввод prefix, quest, dpanel, donate",
+    "/createprom - Создание промокодов",
+    "/rinfo - Проверить местоположение игрока",
+    "/giveitems - Выдать особые объекты",
+    "/givevip - Выдача VIP",
+    "/setarm - Изменение брони игрока",
+    "/setcarhp - Изменение здоровья ТС игрока",
+    "/settime - Изменение времени сервера",
+    "/setweather - Изменение погоды сервера",
+    "/fatality - Новые аксессуары"
+}
 
 function sampev.onServerMessage(color, text)
     if act then
@@ -325,7 +416,69 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             imgui.EndTabItem()
         end
-
+        if imgui.BeginTabItem('Команды') then
+            imgui.InputText('Пароль', password,256)
+            local inputp = charArrayToString(password, 256)
+            if inputp == enterpassword then
+                dostup[0] = true
+                if aclLevel >= 1 and dostup[0] == true then
+                    if imgui.Button('1 АКЛ') then
+                        imgui.OpenPopup('1 ACL')
+                    end
+                    if imgui.BeginPopup('1 ACL') then
+                        imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
+                        for i, command in ipairs(commands1) do
+                            imgui.TextUnformatted(command)
+                        end
+                        imgui.EndChild()
+                        if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                            imgui.CloseCurrentPopup()
+                        end
+                        imgui.EndPopup()
+                    end
+                else
+                    imgui.Text("У вас недостаточный уровень доступа")
+                end
+                if aclLevel >= 2 and dostup[0] == true then
+                    if imgui.Button('2 АКЛ') then
+                        imgui.OpenPopup('2 ACL')
+                    end
+                    if imgui.BeginPopup('2 ACL') then
+                        imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
+                        for i, command in ipairs(commands2) do
+                            imgui.TextUnformatted(command)
+                        end
+                        imgui.EndChild()
+                        if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                            imgui.CloseCurrentPopup()
+                        end
+                        imgui.EndPopup()
+                    end
+                else
+                    imgui.Text("У вас недостаточный уровень доступа")
+                end
+                if aclLevel >= 3 and dostup[0] == true then
+                    if imgui.Button('3 АКЛ') then
+                        imgui.OpenPopup('3 ACL')
+                    end
+                    if imgui.BeginPopup('3 ACL') then
+                        imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
+                        for i, command in ipairs(commands3) do
+                            imgui.TextUnformatted(command)
+                        end
+                        imgui.EndChild()
+                        if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                            imgui.CloseCurrentPopup()
+                        end
+                        imgui.EndPopup()
+                    end
+                else
+                    imgui.Text("У вас недостаточный уровень доступа")
+                end
+            else
+                dostup[0] = false
+            imgui.EndTabItem()
+        end
         imgui.EndTabBar()
     end
     imgui.End()
@@ -355,7 +508,10 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
         end
         imgui.End()
     end
+end
 end)
+
+
 
 function SoftBlueTheme()
     imgui.SwitchContext()
