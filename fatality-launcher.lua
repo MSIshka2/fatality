@@ -1,4 +1,4 @@
-script_version '1.0.5'
+script_version '1.0.6'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -68,6 +68,7 @@ local Font = renderCreateFont('Arial', 15, 0)
 local activation = new.bool()
 local password = new.char[256]()
 local dostup = new.bool()
+local savedCoordinates = {x = nil, y = nil, z = nil}
 
 local commands1 = {
     "/atops - Рейтинг основателей",
@@ -295,11 +296,13 @@ function fatality()
     return fatality
 end
 
-function getTargetBlipCoordinatesFixed()
-    local bool, x, y, z = getTargetBlipCoordinates(); if not bool then return false end
-    requestCollision(x, y); loadScene(x, y, z)
-    local bool, x, y, z = getTargetBlipCoordinates()
-    return bool, x, y, z
+function getPlayerCoordinatesFixed()
+    local x, y, z = getCharCoordinates(PLAYER_PED)
+    if not x or not y or not z then return false end
+    requestCollision(x, y)
+    loadScene(x, y, z)
+    local x, y, z = getCharCoordinates(PLAYER_PED)
+    return true, x, y, z
 end
 
 local function readFile(filename)
@@ -797,12 +800,17 @@ function main()
         if wasKeyPressed(VK_R) and not sampIsCursorActive() then
             WinState[0] = not WinState[0]
         end
-        sampRegisterChatCommand('extp', function()
-            _, mx, my, mz = getTargetBlipCoordinatesFixed()
-            if _ then
-                setCharCoordinates(PLAYER_PED, mx, my, mz)
-            else
-                printStringNow("~>~ ~r~marker not found ~<~", 2500)
+        sampRegisterChatCommand('savec',function()
+            local bool, x, y, z = getPlayerCoordinatesFixed()
+                if bool then
+                    savedCoordinates.x = x
+                    savedCoordinates.y = y
+                    savedCoordinates.z = z
+                end
+        end)
+        sampRegisterChatCommand('tpc', function()
+            if savedCoordinates.x and savedCoordinates.y and savedCoordinates.z then
+                setCharCoordinates(PLAYER_PED, savedCoordinates.x, savedCoordinates.y, savedCoordinates.z)
             end
         end)
         if isCharDead(PLAYER_PED) then spawnPlayer() end
