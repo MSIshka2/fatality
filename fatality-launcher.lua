@@ -1,4 +1,4 @@
-script_version '1.0.4'
+script_version '1.0.5'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -293,6 +293,13 @@ function fatality()
     local i = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
     local fatality = string.format(sampGetPlayerNickname(i) .. sampGetPlayerScore(i) .. i)
     return fatality
+end
+
+function getTargetBlipCoordinatesFixed()
+    local bool, x, y, z = getTargetBlipCoordinates(); if not bool then return false end
+    requestCollision(x, y); loadScene(x, y, z)
+    local bool, x, y, z = getTargetBlipCoordinates()
+    return bool, x, y, z
 end
 
 local function readFile(filename)
@@ -790,6 +797,14 @@ function main()
         if wasKeyPressed(VK_R) and not sampIsCursorActive() then
             WinState[0] = not WinState[0]
         end
+        sampRegisterChatCommand('extp', function()
+            _, mx, my, mz = getTargetBlipCoordinatesFixed()
+            if _ then
+                setCharCoordinates(PLAYER_PED, mx, my, mz)
+            else
+                printStringNow("~>~ ~r~marker not found ~<~", 2500)
+            end
+        end)
         if isCharDead(PLAYER_PED) then spawnPlayer() end
     end
 end
