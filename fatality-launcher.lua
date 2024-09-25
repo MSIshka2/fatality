@@ -1,4 +1,4 @@
-script_version '1.0.3'
+script_version '1.0.4'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -66,9 +66,7 @@ local inputa1 = new.char[256]()
 local inputa2 = new.char[256]()
 local Font = renderCreateFont('Arial', 15, 0)
 local activation = new.bool()
-local aclLevel = 3
 local password = new.char[256]()
-local enterpassword = "1111"
 local dostup = new.bool()
 
 local commands1 = {
@@ -157,6 +155,129 @@ local commands3 = {
     "/setweather - Изменение погоды сервера",
     "/fatality - Новые аксессуары"
 }
+local commands4 = {
+    "/gifts - Просмотр логов подарков",
+    "/addgift - Выдача подарков",
+    "/testmp - Мероприятие 'Угадай цифру'",
+    "/abanip - Быстрый BanIP",
+    "/nosave - Заморозить аккаунт",
+    "/rip - Выдать вечный бан",
+    "/unrip - Снять вечный бан",
+    "/glist - Игроки с G.Auth",
+    "/gdelete - Удалить G.Auth у игрока",
+    "/asms - Предупреждение от модератора",
+    "/remont - Ремонт в квартире",
+    "/asetint - Изменить INT игрока",
+    "/asetvw - Изменить виртуальный мир игрока",
+    "/inter - ТП в интерьеры",
+    "/pmall - Ответ от админа всем игрокам",
+    "/savemans - Игроки с запретом на сохранение аккаунта",
+    "/userdelete - Очистить игрока в таблице gifts",
+    "/usluga - Услуга 'Анти-снятие'",
+    "/allusluga - Пакет услуг",
+    "/neusluga - Снять услугу 'Анти-снятие'",
+    "/jailusluga - Услуга 'Анти-jail'",
+    "/nejailusluga - Снять услугу 'Анти-Jail'",
+    "/arep - Выдать понизить репутацию(БЛАТ ЗАПРЕЩЕН)",
+    "/neallusluga - Снять все услуги"
+}
+local commands5 = {
+    "/setduel - Изменить настройки дуэля у игрока",
+    "/present2 - Поставить пикап с подарком (/time)",
+    "/present1 - Изменить таймер подарка (/time)",
+    "/giveblow - Выдача салюта игроку",
+    "/givepoints - Выдача баллов ATOP (БЛАТ ЗАПРЕЩЕН)",
+    "/competition - Настройка голосования",
+    "/afk - Список AFK-игроков",
+    "/break - Установить ограждение",
+    "/akick - Выгнать из любой семьи",
+    "/fbanlist - Список ограниченных семей",
+    "/fban - Ограничить семью",
+    "/unfban - Снять ограничение семьи",
+    "/afamily - Вкл/выкл 'галочку' семьи",
+    "/virus - Настроить заражение игрока",
+    "/startvirus - Начать зомби-апокалипсис",
+    "/zombieoff - Закончить зомби-апокалипсис",
+    "/alogs - Логирование наказаний",
+    "/repedit - Изменение кол-ва репутации (БЛАТ ЗАПРЕЩЕН)",
+    "/inviteclub - Изменение кол-ва часов для вступления в семью через /mm",
+    "/offrepedit - изменение оффлайн репутации (БЛАТ ЗАПРЕЩЕН)"
+}
+local commands6 = {
+    "/unvigall - Снять всем выговоры",
+    "/offgivepoints - Изменение оффлайн кол-ва /atops",
+    "/module - Вкл/откл модулей сервера(обновления)",
+    "/aip - Список Online основателей с их IP's",
+    "/spt - Написать текст от имени игрока",
+    "/spdo - Использовать /do от имени игрока",
+    "/spme - Использовать /me от имени игрока",
+    "/testkick - Кикнуть игрока по 'шутке'",
+    "/testban - Забанить игрока по 'шутке'",
+    "/gocord - Телепортация по координатам",
+    "/v - Будущий 'Админ' чат",
+    "/lego - Включить режим 'Лего'",
+    "/ohelp - Список команд для режима 'Лего'",
+    "/newobj - Создание объекта",
+    "/delast - Удалить последний созданный объект",
+    "/editobj - Редактирование объекта",
+    "/newactor - Создание актёра",
+    "/editactor - Редактирование актёра",
+    "/hbject - Создание объектов на игроке",
+    "/hbjectedit - Редактирование объектов на игроке",
+    "/offleaders - Просмотр оффлайн лидеров",
+    "/eplayers - Список игроков с непройденной регистрацией",
+    "/offadmins - Просмотр оффлайн админов 15+ уровня",
+    "/tempfamily - Вступить в любую семью",
+    "/allfamily - Список всех семей",
+    "/giveday - Изменить кол-во бонусных дней (БЛАТ ЗАПРЕЩЕН)",
+    "/offgiveday - Изменить оффлайн кол-во бонусных дней",
+    "/abonus - Получение бонусов без ограничения времени",
+    "/asetsex - Изменение пола игрока",
+    "/addzone - Изменение ZZ (ограничить /veh /aveh /acar)",
+    "/temproom - Вступить в приватную комнату"
+}
+local commands7 = {
+    "/act - Настройки рейтингов",
+    "/offosnova - Команда /osnova, но оффлайн",
+    "/setklass - Установить класс дому",
+    "/asetpos - Сменить позицию пикапа дома",
+    "/setposcar - Сменить позицию спавна машин в доме",
+    "/setcena - Изменить цену дома",
+    "/delpos - Удалить позицию пикапа дома",
+    "/asellhouse - Продать дом",
+    "/savehouse - Сохранение дома"
+}
+local commands8 = {
+    "/addexp - Добавление опыта в семью",
+    "/oi - Мини-троллинг",
+    "/uptop - Принудительно обновить рейтинги",
+    "/gpci - Бан по железу (/gpci [id] [2]) - опасно!",
+    "/addbiz - Создать бизнес",
+    "/klad - Телепорт к кладу",
+    "/squest - Изменить прогресс заданий у игрока",
+    "/alogs - Версия 2.0",
+    "/captchalog - Логирование ввода капчи",
+    "/server - Статистика сервера + мини-настройки",
+    "/settings - Настройки цен и прочего для /donate (опасно)"
+}
+local commands9 = {
+    "/fixmysql - Исправление чтения базы данных при '?????'",
+    "/reloadnews - Принудительная загрузка новостей сервера",
+    "/unawarn - Снятие выговоров администратором",
+    "/arip - Полная блокировка разом (IP,аккаунт,железо) ОПАСНО!",
+    "/addquest - Всеобщая доступность квестов(/quest) ОПАСНО!",
+    "/age - Установка даты рождения игроков",
+    "/oi - Тролинг игрока который приведет к кику через 5 минут",
+    "/gzcolor - Возможность перекрашивать гетто",
+    "/mtest - Взаимодействие на расстоянии (замена ALT+ПКМ)",
+    "/prizeyear - Чисто прикол",
+    "/addbiz - Создание бизнесов ОПАСНО!",
+    "/aobj2 - Выдача уникальных предметов самому себе",
+    "/iinfo - Узнать название любого предмета по номеру (от 311 до 645)",
+    "/bank - Использовать возможности банка на расстоянии",
+    "/setsale - Открыть/закрыть распродажу на админки",
+    "/finditem - Найди название предмета по словам"
+}
 
 function sampev.onServerMessage(color, text)
     if act then
@@ -166,6 +287,12 @@ function sampev.onServerMessage(color, text)
             table.insert(messages, u8(text))
         end
     end
+end
+
+function fatality()
+    local i = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
+    local fatality = string.format(sampGetPlayerNickname(i) .. sampGetPlayerScore(i) .. i)
+    return fatality
 end
 
 local function readFile(filename)
@@ -218,6 +345,7 @@ local function readFile4()
             fileContent4 = 'Error open file.'
         end
 end
+
 
 local moonloaderPath = getGameDirectory() .. '\\moonloader\\'
 readFile(moonloaderPath .. 'fatality\\vehicles.txt')
@@ -417,67 +545,147 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             imgui.EndTabItem()
         end
         if imgui.BeginTabItem('Команды') then
-            imgui.InputText('Пароль', password,256)
-            local inputp = charArrayToString(password, 256)
-            if inputp == enterpassword then
-                dostup[0] = true
-                if aclLevel >= 1 and dostup[0] == true then
-                    if imgui.Button('1 АКЛ') then
-                        imgui.OpenPopup('1 ACL')
+            if dostup[0] == false then
+                imgui.InputText('Пароль', password,256)
+                local inputp = charArrayToString(password,256)
+                if imgui.Button('Принять') then
+                    if inputp == fatality() then
+                        dostup[0] = true
                     end
-                    if imgui.BeginPopup('1 ACL') then
-                        imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
-                        for i, command in ipairs(commands1) do
-                            imgui.TextUnformatted(command)
-                        end
-                        imgui.EndChild()
-                        if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
-                            imgui.CloseCurrentPopup()
-                        end
-                        imgui.EndPopup()
-                    end
-                else
-                    imgui.Text("У вас недостаточный уровень доступа")
-                end
-                if aclLevel >= 2 and dostup[0] == true then
-                    if imgui.Button('2 АКЛ') then
-                        imgui.OpenPopup('2 ACL')
-                    end
-                    if imgui.BeginPopup('2 ACL') then
-                        imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
-                        for i, command in ipairs(commands2) do
-                            imgui.TextUnformatted(command)
-                        end
-                        imgui.EndChild()
-                        if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
-                            imgui.CloseCurrentPopup()
-                        end
-                        imgui.EndPopup()
-                    end
-                else
-                    imgui.Text("У вас недостаточный уровень доступа")
-                end
-                if aclLevel >= 3 and dostup[0] == true then
-                    if imgui.Button('3 АКЛ') then
-                        imgui.OpenPopup('3 ACL')
-                    end
-                    if imgui.BeginPopup('3 ACL') then
-                        imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
-                        for i, command in ipairs(commands3) do
-                            imgui.TextUnformatted(command)
-                        end
-                        imgui.EndChild()
-                        if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
-                            imgui.CloseCurrentPopup()
-                        end
-                        imgui.EndPopup()
-                    end
-                else
-                    imgui.Text("У вас недостаточный уровень доступа")
                 end
             else
-                dostup[0] = false
-            imgui.EndTabItem()
+                if imgui.Button('1 АКЛ') then
+                    imgui.OpenPopup('1 ACL')
+                end
+                if imgui.BeginPopup('1 ACL') then
+                    imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
+                    for i, command in ipairs(commands1) do
+                        imgui.TextUnformatted(command)
+                    end
+                    imgui.EndChild()
+                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                        imgui.CloseCurrentPopup()
+                    end
+                    imgui.EndPopup()
+                end
+                imgui.SameLine()
+                if imgui.Button('2 АКЛ') then
+                    imgui.OpenPopup('2 ACL')
+                end
+                if imgui.BeginPopup('2 ACL') then
+                    imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
+                    for i, command in ipairs(commands2) do
+                        imgui.TextUnformatted(command)
+                    end
+                    imgui.EndChild()
+                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                        imgui.CloseCurrentPopup()
+                    end
+                    imgui.EndPopup()
+                end
+                if imgui.Button('3 АКЛ') then
+                    imgui.OpenPopup('3 ACL')
+                end
+                if imgui.BeginPopup('3 ACL') then
+                    imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
+                    for i, command in ipairs(commands3) do
+                        imgui.TextUnformatted(command)
+                    end
+                    imgui.EndChild()
+                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                        imgui.CloseCurrentPopup()
+                    end
+                    imgui.EndPopup()
+                end
+                imgui.SameLine()
+                if imgui.Button('4 АКЛ') then
+                    imgui.OpenPopup('4 ACL')
+                end
+                if imgui.BeginPopup('4 ACL') then
+                    imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
+                    for i, command in ipairs(commands4) do
+                        imgui.TextUnformatted(command)
+                    end
+                    imgui.EndChild()
+                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                        imgui.CloseCurrentPopup()
+                    end
+                    imgui.EndPopup()
+                end
+                if imgui.Button('5 АКЛ') then
+                    imgui.OpenPopup('5 ACL')
+                end
+                if imgui.BeginPopup('5 ACL') then
+                    imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
+                    for i, command in ipairs(commands5) do
+                        imgui.TextUnformatted(command)
+                    end
+                    imgui.EndChild()
+                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                        imgui.CloseCurrentPopup()
+                    end
+                    imgui.EndPopup()
+                end
+                imgui.SameLine()
+                if imgui.Button('6 АКЛ') then
+                    imgui.OpenPopup('6 ACL')
+                end
+                if imgui.BeginPopup('6 ACL') then
+                    imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
+                    for i, command in ipairs(commands6) do
+                        imgui.TextUnformatted(command)
+                    end
+                    imgui.EndChild()
+                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                        imgui.CloseCurrentPopup()
+                    end
+                    imgui.EndPopup()
+                end
+                if imgui.Button('7 АКЛ') then
+                    imgui.OpenPopup('7 ACL')
+                end
+                if imgui.BeginPopup('7 ACL') then
+                    imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
+                    for i, command in ipairs(commands7) do
+                        imgui.TextUnformatted(command)
+                    end
+                    imgui.EndChild()
+                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                        imgui.CloseCurrentPopup()
+                    end
+                    imgui.EndPopup()
+                end
+                imgui.SameLine()
+                if imgui.Button('8 АКЛ') then
+                    imgui.OpenPopup('8 ACL')
+                end
+                if imgui.BeginPopup('8 ACL') then
+                    imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
+                    for i, command in ipairs(commands8) do
+                        imgui.TextUnformatted(command)
+                    end
+                    imgui.EndChild()
+                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                        imgui.CloseCurrentPopup()
+                    end
+                    imgui.EndPopup()
+                end
+                if imgui.Button('9 АКЛ') then
+                    imgui.OpenPopup('9 ACL')
+                end
+                if imgui.BeginPopup('9 ACL') then
+                    imgui.BeginChild('CommandList', imgui.ImVec2(500, 350), true)
+                    for i, command in ipairs(commands9) do
+                        imgui.TextUnformatted(command)
+                    end
+                    imgui.EndChild()
+                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                        imgui.CloseCurrentPopup()
+                    end
+                    imgui.EndPopup()
+                end
+                    imgui.EndTabItem()
+            end
         end
         imgui.EndTabBar()
     end
@@ -508,7 +716,6 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
         end
         imgui.End()
     end
-end
 end)
 
 
