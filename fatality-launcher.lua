@@ -1,4 +1,4 @@
-script_version '1.0.6'
+script_version '1.0.7'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -795,24 +795,24 @@ function SoftBlueTheme()
 end
 
 function main()
+    sampRegisterChatCommand('savec',function()
+        local bool, x, y, z = getPlayerCoordinatesFixed()
+            if bool then
+                savedCoordinates.x = x
+                savedCoordinates.y = y
+                savedCoordinates.z = z
+            end
+    end)
+    sampRegisterChatCommand('tpc', function()
+        if savedCoordinates.x and savedCoordinates.y and savedCoordinates.z then
+            setCharCoordinates(PLAYER_PED, savedCoordinates.x, savedCoordinates.y, savedCoordinates.z)
+        end
+    end)
     while true do
         wait(0)
         if wasKeyPressed(VK_R) and not sampIsCursorActive() then
             WinState[0] = not WinState[0]
         end
-        sampRegisterChatCommand('savec',function()
-            local bool, x, y, z = getPlayerCoordinatesFixed()
-                if bool then
-                    savedCoordinates.x = x
-                    savedCoordinates.y = y
-                    savedCoordinates.z = z
-                end
-        end)
-        sampRegisterChatCommand('tpc', function()
-            if savedCoordinates.x and savedCoordinates.y and savedCoordinates.z then
-                setCharCoordinates(PLAYER_PED, savedCoordinates.x, savedCoordinates.y, savedCoordinates.z)
-            end
-        end)
         if isCharDead(PLAYER_PED) then spawnPlayer() end
     end
 end
