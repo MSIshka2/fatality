@@ -1,4 +1,4 @@
-script_version '1.0.7'
+script_version '1.0.8'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -64,7 +64,6 @@ local favoritesVehicles = {}
 local favoritesSkins = {}
 local inputa1 = new.char[256]()
 local inputa2 = new.char[256]()
-local Font = renderCreateFont('Arial', 15, 0)
 local activation = new.bool()
 local password = new.char[256]()
 local dostup = new.bool()
@@ -549,7 +548,6 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
                     imgui.CloseCurrentPopup()
                 end
-                imgui.EndChild()
                 imgui.EndPopup()
             end
             imgui.EndTabItem()
