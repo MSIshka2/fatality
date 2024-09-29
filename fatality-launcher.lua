@@ -1,4 +1,4 @@
-script_version '1.0.8'
+script_version '1.0.9'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -289,6 +289,7 @@ function sampev.onServerMessage(color, text)
     end
 end
 
+
 function fatality()
     local i = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
     local fatality = string.format(sampGetPlayerNickname(i) .. sampGetPlayerScore(i) .. i)
@@ -504,11 +505,11 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                     imgui.TextWrapped(msg)
                 end
                 imgui.EndPopup()
-                imgui.SetCursorPos(imgui.ImVec2(15, 305.0))
+                imgui.SetCursorPos(imgui.ImVec2(checkx[0]-485, checky[0]+155))
             if imgui.Button('Очистить') then
                 messages = {}
             end
-            imgui.SetCursorPos(imgui.ImVec2(93, 305.0))
+            imgui.SetCursorPos(imgui.ImVec2(checkx[0]-400, checky[0]+155.0))
             if imgui.Button('Настройки') then
                 imgui.OpenPopup('Settings')
             end
