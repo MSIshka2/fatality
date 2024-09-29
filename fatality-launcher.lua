@@ -1,4 +1,4 @@
-script_version '1.0.9'
+script_version '1.1.0'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -482,6 +482,9 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 local aksID2 = charArrayToString(inputa2,256)
                 sampSendChat('/launcher ' .. aksID)
                 sampSendChat('/launcher ' .. aksID2)
+            end
+            if imgui.Button('Очистить аксы') then
+                sampSendChat('/reset')
             end
             imgui.EndTabItem()
         end
