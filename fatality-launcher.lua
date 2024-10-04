@@ -1,4 +1,4 @@
-script_version '1.1.0'
+script_version '1.1.1'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -289,7 +289,6 @@ function sampev.onServerMessage(color, text)
     end
 end
 
-
 function fatality()
     local i = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
     local fatality = string.format(sampGetPlayerNickname(i) .. sampGetPlayerScore(i) .. i)
@@ -303,6 +302,18 @@ function getPlayerCoordinatesFixed()
     loadScene(x, y, z)
     local x, y, z = getCharCoordinates(PLAYER_PED)
     return true, x, y, z
+end
+
+function imgui.TextQuestion(label, description)
+    imgui.TextDisabled(label)
+
+    if imgui.IsItemHovered() then
+        imgui.BeginTooltip()
+            imgui.PushTextWrapPos(600)
+                imgui.TextUnformatted(description)
+            imgui.PopTextWrapPos()
+        imgui.EndTooltip()
+    end
 end
 
 local function readFile(filename)
@@ -386,8 +397,50 @@ imgui.OnInitialize(function()
     SoftBlueTheme()
 end)
 imgui.OnFrame(function() return WinState[0] end, function(player)
-    imgui.Begin('##Window', WinState, imgui.WindowFlags.NoScrollbar)
+    imgui.Begin('Fatality', WinState, imgui.WindowFlags.NoScrollbar)
     if imgui.BeginTabBar('Tabs') then
+        if imgui.BeginTabItem('Основное') then
+            if imgui.Button('Спавн') then
+                spawnPlayer()
+            end
+            if imgui.IsItemHovered() then
+                imgui.BeginTooltip()
+                imgui.Text('Если не работает:')
+                imgui.Text('1. /re <любой игрок>')
+                imgui.Text('2. Выйдите из /re')
+                imgui.Text('3. Нажмите кнопку спавна')
+                imgui.EndTooltip()
+            end
+            if imgui.Button('Обновить скрипт') then
+                update()
+            end
+                imgui.BeginChild("ChatLog", imgui.ImVec2(checkx[0], checky[0]), true)      
+                for _, msg in ipairs(messages) do
+                    imgui.TextWrapped(msg)
+                end
+                imgui.EndPopup()
+                imgui.SetCursorPos(imgui.ImVec2(checkx[0]-485, checky[0]+155))
+            if imgui.Button('Очистить') then
+                messages = {}
+            end
+            imgui.SetCursorPos(imgui.ImVec2(checkx[0]-400, checky[0]+155.0))
+            if imgui.Button('Настройки') then
+                imgui.OpenPopup('Settings')
+            end
+            if imgui.BeginPopup('Settings') then
+                imgui.SliderFloat('X', checkx, 1, 1000)
+                imgui.SliderFloat('Y', checky, 1, 1000)
+                if imgui.Button('Reset') then
+                    checkx[0] = 500.000
+                    checky[0] = 150.000
+                end
+                imgui.EndPopup()
+            end
+            imgui.SameLine()
+            imgui.SetCursorPos(imgui.ImVec2(210, 305))
+            imgui.TextQuestion("(?)", "Author: Harry_Pattersone")
+            imgui.EndTabItem()
+        end
         if imgui.BeginTabItem('Машины') then
             if imgui.Button('Открыть список машин') then
                 imgui.OpenPopup('List Cars')
@@ -412,7 +465,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 end
                 imgui.TextUnformatted(fileContent)
                 imgui.EndChild()
-                if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                if imgui.Button('Закрыть', imgui.ImVec2(280, 30)) then
                     imgui.CloseCurrentPopup()
                 end
                 imgui.EndPopup()
@@ -462,7 +515,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 end
                 imgui.TextUnformatted(fileContent2)
                 imgui.EndChild()
-                if imgui.Button('Close', imgui.ImVec2(280, 24)) then
+                if imgui.Button('Закрыть', imgui.ImVec2(280, 30)) then
                     imgui.CloseCurrentPopup()
                 end
                 imgui.EndPopup()
@@ -485,45 +538,6 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             if imgui.Button('Очистить аксы') then
                 sampSendChat('/reset')
-            end
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem('Основное') then
-            if imgui.Button('Спавн') then
-                spawnPlayer()
-            end
-            if imgui.IsItemHovered() then
-                imgui.BeginTooltip()
-                imgui.Text('Если не работает:')
-                imgui.Text('1. /re <любой игрок>')
-                imgui.Text('2. Выйдите из /re')
-                imgui.Text('3. Нажмите кнопку спавна')
-                imgui.EndTooltip()
-            end
-            if imgui.Button('Обновить скрипт') then
-                update()
-            end
-                imgui.BeginChild("ChatLog", imgui.ImVec2(checkx[0], checky[0]), true)      
-                for _, msg in ipairs(messages) do
-                    imgui.TextWrapped(msg)
-                end
-                imgui.EndPopup()
-                imgui.SetCursorPos(imgui.ImVec2(checkx[0]-485, checky[0]+155))
-            if imgui.Button('Очистить') then
-                messages = {}
-            end
-            imgui.SetCursorPos(imgui.ImVec2(checkx[0]-400, checky[0]+155.0))
-            if imgui.Button('Настройки') then
-                imgui.OpenPopup('Settings')
-            end
-            if imgui.BeginPopup('Settings') then
-                imgui.SliderFloat('X', checkx, 1, 1000)
-                imgui.SliderFloat('Y', checky, 1, 1000)
-                if imgui.Button('Reset') then
-                    checkx[0] = 500.000
-                    checky[0] = 150.000
-                end
-                imgui.EndPopup()
             end
             imgui.EndTabItem()
         end
@@ -815,6 +829,5 @@ function main()
         if wasKeyPressed(VK_R) and not sampIsCursorActive() then
             WinState[0] = not WinState[0]
         end
-        if isCharDead(PLAYER_PED) then spawnPlayer() end
     end
 end
