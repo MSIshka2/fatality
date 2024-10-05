@@ -1,4 +1,4 @@
-script_version '1.1.2'
+script_version '1.1.3'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -11,6 +11,8 @@ local new = imgui.new
 local dlstatus = require "moonloader".download_status
 local sampev = require 'samp.events'
 local notify = import 'imgui_notf.lua'
+local sound = loadAudioStream('https://rus.hitmotop.com/get/music/20201122/Neizvestnyjj_-_uvedomlenie_71698862.mp3')
+assert(sound, 'File not found!')
 
 
 function update()
@@ -287,6 +289,8 @@ function sampev.onServerMessage(color, text)
         if text:find(u8:decode("к%s") .. name ) then
             table.insert(messages, u8(text))
             notify.addNotification(string.format(u8:decode("Новое сообщение\n\n %s"), text), 25)
+            setAudioStreamVolume(sound, 10)
+            setAudioStreamState(sound, 1)
         end
     end
 end
