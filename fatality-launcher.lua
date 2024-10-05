@@ -1,4 +1,4 @@
-script_version '1.1.3'
+script_version '1.1.4'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -288,7 +288,7 @@ function sampev.onServerMessage(color, text)
         local name = sampGetPlayerNickname(playerid2)
         if text:find(u8:decode("к%s") .. name ) then
             table.insert(messages, u8(text))
-            notify.addNotification(string.format(u8:decode("Новое сообщение\n\n %s"), text), 25)
+            notify.addNotification(string.format(u8:decode("Новое сообщение\n\n %s"), text), 120)
             setAudioStreamVolume(sound, 10)
             setAudioStreamState(sound, 1)
         end
@@ -399,6 +399,7 @@ local function spawnPlayer()
     sampSendChat('/skin ' .. id)
 end
 
+
 imgui.OnInitialize(function()
     SoftBlueTheme()
 end)
@@ -406,6 +407,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
     imgui.Begin('Fatality', WinState, imgui.WindowFlags.NoScrollbar)
     if imgui.BeginTabBar('Tabs') then
         if imgui.BeginTabItem('Основное') then
+
             if imgui.Button('Спавн') then
                 spawnPlayer()
             end
