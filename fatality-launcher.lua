@@ -1,4 +1,4 @@
-script_version '1.1.1'
+script_version '1.1.2'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -10,6 +10,7 @@ local function recode(u8) return encoding.UTF8:decode(u8) end
 local new = imgui.new
 local dlstatus = require "moonloader".download_status
 local sampev = require 'samp.events'
+local notify = import 'imgui_notf.lua'
 
 
 function update()
@@ -283,8 +284,9 @@ function sampev.onServerMessage(color, text)
     if act then
         local playerid2 = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
         local name = sampGetPlayerNickname(playerid2)
-        if text:find("<%s*.-%s*" .. name ) then
+        if text:find(u8:decode("к%s") .. name ) then
             table.insert(messages, u8(text))
+            notify.addNotification(string.format(u8:decode("Новое сообщение\n\n %s"), text), 25)
         end
     end
 end
