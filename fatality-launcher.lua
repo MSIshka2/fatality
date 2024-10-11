@@ -1,4 +1,4 @@
-script_version '1.1.5'
+script_version '1.1.6'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -404,6 +404,13 @@ function sampev.onSetPlayerHealth(health)
     local playerid = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
     if health < 30 and hp == true then
         sampSendChat('/hp ' .. playerid)
+    end
+    if health ~= 0 and hp == true then
+        lua_thread.create(function()
+        hp = false
+        wait(5000)
+        hp = true
+        end)
     end
 end
 
