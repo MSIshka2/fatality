@@ -408,7 +408,7 @@ function sampev.onSetPlayerHealth(health)
     if health ~= 0 and hp == true then
         lua_thread.create(function()
         hp = false
-        wait(5000)
+        wait(6000)
         hp = true
         end)
     end
