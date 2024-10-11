@@ -1,4 +1,4 @@
-script_version '1.1.4'
+script_version '1.1.5'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -13,7 +13,6 @@ local sampev = require 'samp.events'
 local notify = import 'imgui_notf.lua'
 local sound = loadAudioStream('https://rus.hitmotop.com/get/music/20201122/Neizvestnyjj_-_uvedomlenie_71698862.mp3')
 assert(sound, 'File not found!')
-
 
 function update()
     local updatePath = os.getenv('TEMP')..'\\Update.json'
@@ -71,6 +70,7 @@ local activation = new.bool()
 local password = new.char[256]()
 local dostup = new.bool()
 local savedCoordinates = {x = nil, y = nil, z = nil}
+local hp = new.bool()
 
 local commands1 = {
     "/atops - Рейтинг основателей",
@@ -289,6 +289,7 @@ function sampev.onServerMessage(color, text)
         if text:find(u8:decode("к%s") .. name ) then
             table.insert(messages, u8(text))
             notify.addNotification(string.format(u8:decode("Новое сообщение\n\n %s"), text), 120)
+            addOneOffSound(0.0, 0.0, 0.0, 1054)
             setAudioStreamVolume(sound, 10)
             setAudioStreamState(sound, 1)
         end
@@ -399,6 +400,12 @@ local function spawnPlayer()
     sampSendChat('/skin ' .. id)
 end
 
+function sampev.onSetPlayerHealth(health)
+    local playerid = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
+    if health < 30 and hp == true then
+        sampSendChat('/hp ' .. playerid)
+    end
+end
 
 imgui.OnInitialize(function()
     SoftBlueTheme()
@@ -407,7 +414,6 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
     imgui.Begin('Fatality', WinState, imgui.WindowFlags.NoScrollbar)
     if imgui.BeginTabBar('Tabs') then
         if imgui.BeginTabItem('Основное') then
-
             if imgui.Button('Спавн') then
                 spawnPlayer()
             end
@@ -417,6 +423,19 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.Text('1. /re <любой игрок>')
                 imgui.Text('2. Выйдите из /re')
                 imgui.Text('3. Нажмите кнопку спавна')
+                imgui.EndTooltip()
+            end
+            imgui.SameLine()
+            imgui.SetCursorPos(imgui.ImVec2(155, 80.0))
+            imgui.Checkbox('Авто-ХП', checkboxone)
+            if checkboxone[0] == true then
+                hp = true
+            else
+                hp = false
+            end
+            if imgui.IsItemHovered() then
+                imgui.BeginTooltip()
+                imgui.Text('Восполняет хп, если у вас меньше 30 хп')
                 imgui.EndTooltip()
             end
             if imgui.Button('Обновить скрипт') then
