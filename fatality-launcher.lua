@@ -1,4 +1,4 @@
-script_version '1.1.7'
+script_version '1.2.0'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
