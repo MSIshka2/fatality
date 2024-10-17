@@ -1,4 +1,4 @@
-script_version '1.2.0'
+script_version '1.2.1'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -71,6 +71,8 @@ local password = new.char[256]()
 local dostup = new.bool()
 local savedCoordinates = {x = nil, y = nil, z = nil}
 local hp = new.bool()
+local status = false
+local status1 = false
 
 local commands1 = {
     "/atops - Рейтинг основателей",
@@ -288,11 +290,58 @@ function sampev.onServerMessage(color, text)
         local name = sampGetPlayerNickname(playerid2)
         if text:find(u8:decode("к%s") .. name ) then
             table.insert(messages, u8(text))
-            notify.addNotification(string.format(u8:decode("Новое сообщение\n\n %s"), text), 120)
+            notify.addNotification(string.format(u8:decode("Новое сообщение\n\n %s")), text, 30)
             addOneOffSound(0.0, 0.0, 0.0, 1054)
             setAudioStreamVolume(sound, 10)
             setAudioStreamState(sound, 1)
         end
+    end
+end
+
+function sampGetListboxItemText(str, item)
+    local num_ = 0
+    for str in string.gmatch(str, "[^\r\n]+") do
+        if item == num_ then return str end
+        num_ = num_ + 1
+    end
+    return false
+end
+function sampGetListboxItemsCount(text)
+    local i = 0
+    for _ in text:gmatch(".-\n") do
+        i = i + 1
+    end
+    return i
+end
+
+function sampev.onShowDialog(id, s, t, b1, b2 ,text)
+    if status then
+        lua_thread.create(function()
+        for i=1, sampGetListboxItemsCount(text)-1 do
+            if sampGetListboxItemText(text, i):find(u8:decode('Охлаждающая')) then
+                sampSendDialogResponse(id, 1, i-1, _)
+                sampSendDialogResponse(sampGetCurrentDialogId(), 1, nil, nil)
+                wait(1000)
+                sampSendDialogResponse(sampGetCurrentDialogId(), 1, nil, nil)
+                sampCloseCurrentDialogWithButton(0)
+            end
+            status = false
+        end
+    end)
+    end
+    if status1 then
+        lua_thread.create(function()
+            for i=1, sampGetListboxItemsCount(text)-1 do
+                if sampGetListboxItemText(text, i):find(u8:decode('Смазка')) then
+                    sampSendDialogResponse(id, 1, i-1, _)
+                    sampSendDialogResponse(sampGetCurrentDialogId(), 1, nil, nil)
+                    wait(1000)
+                    sampSendDialogResponse(sampGetCurrentDialogId(), 1, nil, nil)
+                    sampCloseCurrentDialogWithButton(0)
+                end
+                status1 = false
+            end
+        end)
     end
 end
 
@@ -856,6 +905,18 @@ function main()
     sampRegisterChatCommand('tpc', function()
         if savedCoordinates.x and savedCoordinates.y and savedCoordinates.z then
             setCharCoordinates(PLAYER_PED, savedCoordinates.x, savedCoordinates.y, savedCoordinates.z)
+        end
+    end)
+    sampRegisterChatCommand('vd',function()
+        status = not status
+        if status then
+            sampSendChat('/i')
+        end
+    end)
+    sampRegisterChatCommand('vd1',function()
+        status1 = not status1
+        if status1 then
+            sampSendChat('/i')
         end
     end)
     while true do
