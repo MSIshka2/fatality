@@ -1,4 +1,4 @@
-script_version '1.2.1'
+script_version '1.2.2'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -11,7 +11,18 @@ local new = imgui.new
 local dlstatus = require "moonloader".download_status
 local sampev = require 'samp.events'
 local notify = import 'imgui_notf.lua'
+local effil = require("effil")
+local inicfg = require('inicfg')
 local sound = loadAudioStream('https://rus.hitmotop.com/get/music/20201122/Neizvestnyjj_-_uvedomlenie_71698862.mp3')
+local IniFilename = 'fatalitytg.ini'
+local ini = inicfg.load({
+    telegramtc = {
+        token = 'token',
+        chat_id = 'chat_id'
+    }
+}, IniFilename)
+inicfg.save(ini, IniFilename)
+
 assert(sound, 'File not found!')
 
 function update()
@@ -73,6 +84,9 @@ local savedCoordinates = {x = nil, y = nil, z = nil}
 local hp = new.bool()
 local status = false
 local status1 = false
+local tokenbuffer = new.char[256]()
+local chatidbuffer = new.char[256]()
+
 
 local commands1 = {
     "/atops - Рейтинг основателей",
@@ -284,16 +298,156 @@ local commands9 = {
     "/finditem - Найди название предмета по словам"
 }
 
+
+local updateid
+function threadHandle(runner, url, args, resolve, reject)
+    local t = runner(url, args)
+    local r = t:get(0)
+    while not r do
+        r = t:get(0)
+        wait(0)
+    end
+    local status = t:status()
+    if status == 'completed' then
+        local ok, result = r[1], r[2]
+        if ok then resolve(result) else reject(result) end
+    elseif err then
+        reject(err)
+    elseif status == 'canceled' then
+        reject(status)
+    end
+    t:cancel(0)
+end
+
+function requestRunner()
+    return effil.thread(function(u, a)
+        local https = require 'ssl.https'
+        local ok, result = pcall(https.request, u, a)
+        if ok then
+            return {true, result}
+        else
+            return {false, result}
+        end
+    end)
+end
+
+function async_http_request(url, args, resolve, reject)
+    local runner = requestRunner()
+    if not reject then reject = function() end end
+    lua_thread.create(function()
+        threadHandle(runner, url, args, resolve, reject)
+    end)
+end
+
+function encodeUrl(str)
+    str = str:gsub(' ', '%+')
+    str = str:gsub('\n', '%%0A')
+    return u8:encode(str, 'CP1251')
+end
+
+function sendTelegramNotification(msg) -- функция для отправки сообщения юзеру
+    msg = msg:gsub('{......}', '') --тут типо убираем цвет
+    msg = encodeUrl(msg) -- ну тут мы закодируем строку
+    async_http_request('https://api.telegram.org/bot' .. ini.telegramtc.token .. '/sendMessage?chat_id=' .. ini.telegramtc.chat_id .. '&text='..msg,'', function(result) end) -- а тут уже отправка
+end
+
+function get_telegram_updates() -- функция получения сообщений от юзера
+    while not updateid do wait(1) end -- ждем пока не узнаем последний ID
+    local runner = requestRunner()
+    local reject = function() end
+    local args = ''
+    while true do
+        url = 'https://api.telegram.org/bot'..ini.telegramtc.token..'/getUpdates?chat_id='..ini.telegramtc.chat_id..'&offset=-1' -- создаем ссылку
+        threadHandle(runner, url, args, processing_telegram_messages, reject)
+        wait(0)
+    end
+end
+
+function processing_telegram_messages(result) -- функция проверОчки того что отправил чел
+    if result then
+        -- тута мы проверяем все ли верно
+        local proc_table = decodeJson(result)
+        if proc_table.ok then
+            if #proc_table.result > 0 then
+                local res_table = proc_table.result[1]
+                if res_table then
+                    if res_table.update_id ~= updateid then
+                        updateid = res_table.update_id
+                        local message_from_user = res_table.message.text
+                        if message_from_user then
+                            -- и тут если чел отправил текст мы сверяем
+                            local text = u8:decode(message_from_user) .. ' ' --добавляем в конец пробел дабы не произошли тех. шоколадки с командами(типо чтоб !q не считалось как !qq)
+                            if text:match('^!qq') then
+                                sendTelegramNotification(u8:decode('Ку'))
+                            elseif text:match('^!q') then
+                                sendTelegramNotification(u8:decode('Привет!'))
+                            elseif text:match('^!online') then
+                                online = sampGetPlayerCount(false)
+                                sendTelegramNotification(u8:decode('Онлайн на сервере: '..online))
+                                for g = 0, online-1 do
+                                    wait(100)
+                                    if doesCharExist(ped) then
+                                        nickp = sampGetPlayerNickname(g)
+                                        if nickp == nil then
+                                            sendTelegramNotification(u8:decode('Игрок с идом ['..g..'] не найден'))
+                                        else
+                                            sendTelegramNotification(u8:decode('Игрок: '..nickp..'['..g..']'))
+                                            nickp = ''
+                                        end
+                                    end
+                                end
+                            elseif text:match('^!send') then
+                                local arg = text:gsub('!send%s','',1) -- вот так мы получаем аргумент команды
+                                    if #arg > 0 then
+                                    sampSendChat(arg)
+                                end
+                            else -- если же не найдется ни одна из команд выше, выведем сообщение
+                                sendTelegramNotification(u8:decode('Неизвестная команда!'))
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+function getLastUpdate() -- тут мы получаем последний ID сообщения, если же у вас в коде будет настройка токена и chat_id, вызовите эту функцию для того чтоб получить последнее сообщение
+    async_http_request('https://api.telegram.org/bot'..ini.telegramtc.token..'/getUpdates?chat_id='..ini.telegramtc.chat_id..'&offset=-1','',function(result)
+        if result then
+            local proc_table = decodeJson(result)
+            if proc_table.ok then
+                if #proc_table.result > 0 then
+                    local res_table = proc_table.result[1]
+                    if res_table then
+                        updateid = res_table.update_id
+                    end
+                else
+                    updateid = 1 -- тут зададим значение 1, если таблица будет пустая
+                end
+            end
+        end
+    end)
+end
+
+
 function sampev.onServerMessage(color, text)
     if act then
         local playerid2 = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
         local name = sampGetPlayerNickname(playerid2)
         if text:find(u8:decode("к%s") .. name ) then
             table.insert(messages, u8(text))
-            notify.addNotification(string.format(u8:decode("Новое сообщение\n\n %s")), text, 30)
+            notify.addNotification(string.format(u8:decode("Новое сообщение\n\n %s"), text), 30)
+            sendTelegramNotification(text)
             addOneOffSound(0.0, 0.0, 0.0, 1054)
             setAudioStreamVolume(sound, 10)
             setAudioStreamState(sound, 1)
+        end
+        if text:find(u8:decode("@") .. name ) then
+            sendTelegramNotification(text)
+        end
+        if text:find(u8:decode("для%s".. name)) then
+            sendTelegramNotification(text)
         end
     end
 end
@@ -306,19 +460,19 @@ function sampGetListboxItemText(str, item)
     end
     return false
 end
-function sampGetListboxItemsCount(text)
+function sampGetListboxItemsCount(text2)
     local i = 0
-    for _ in text:gmatch(".-\n") do
+    for _ in text2:gmatch(".-\n") do
         i = i + 1
     end
     return i
 end
 
-function sampev.onShowDialog(id, s, t, b1, b2 ,text)
+function sampev.onShowDialog(id, s, t, b1, b2 ,text2)
     if status then
         lua_thread.create(function()
-        for i=1, sampGetListboxItemsCount(text)-1 do
-            if sampGetListboxItemText(text, i):find(u8:decode('Охлаждающая')) then
+        for i=1, sampGetListboxItemsCount(text2)-1 do
+            if sampGetListboxItemText(text2, i):find(u8:decode('Охлаждающая')) then
                 sampSendDialogResponse(id, 1, i-1, _)
                 sampSendDialogResponse(sampGetCurrentDialogId(), 1, nil, nil)
                 wait(1000)
@@ -331,8 +485,8 @@ function sampev.onShowDialog(id, s, t, b1, b2 ,text)
     end
     if status1 then
         lua_thread.create(function()
-            for i=1, sampGetListboxItemsCount(text)-1 do
-                if sampGetListboxItemText(text, i):find(u8:decode('Смазка')) then
+            for i=1, sampGetListboxItemsCount(text2)-1 do
+                if sampGetListboxItemText(text2, i):find(u8:decode('Смазка')) then
                     sampSendDialogResponse(id, 1, i-1, _)
                     sampSendDialogResponse(sampGetCurrentDialogId(), 1, nil, nil)
                     wait(1000)
@@ -796,6 +950,24 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                     imgui.EndTabItem()
             end
         end
+        if imgui.BeginTabItem('Телеграм') then
+            imgui.InputText('Token', tokenbuffer, 256)
+            token = charArrayToString(tokenbuffer,256)
+            imgui.InputText('chatid', chatidbuffer, 256)
+            chat_id = charArrayToString(chatidbuffer,256)
+            if imgui.Button('Сохранить') then
+                ini.telegramtc.token = token
+                ini.telegramtc.chat_id = chat_id
+                sampAddChatMessage('Token: ' .. ini.telegramtc.token,-1)
+                sampAddChatMessage('Chat_Id: ' .. ini.telegramtc.chat_id,-1)
+                sampAddChatMessage('Путь: ' .. IniFilename,-1)
+                inicfg.save(ini, IniFilename)
+            end
+            imgui.Text('Команды:')
+            imgui.Text('В TG:\n!send - отправит в чат ваше сообщение. (Например !send /pm 5 q)\n!online - отобразит онлайн на сервере,\nа также выведет всех игроков с их идом(БЕТА, может крашить скрипт)')
+            imgui.Text('В игре:\nПри любом упоминание(/pm, /ans, /sms, @Ваш_ник) прийдёт уведомление в телеграмм')
+            imgui.EndTabItem()
+        end
         imgui.EndTabBar()
     end
     imgui.End()
@@ -919,6 +1091,11 @@ function main()
             sampSendChat('/i')
         end
     end)
+
+
+    lua_thread.create(get_telegram_updates)
+        getLastUpdate()
+
     while true do
         wait(0)
         if wasKeyPressed(VK_R) and not sampIsCursorActive() then
