@@ -1,4 +1,4 @@
-script_version '1.2.3'
+script_version '1.2.4'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -13,6 +13,9 @@ local sampev = require 'samp.events'
 local notify = import 'imgui_notf.lua'
 local effil = require("effil")
 local inicfg = require('inicfg')
+local ffi = require('ffi')
+local bitex = require 'bitex'
+local memory = require 'memory'
 local sound = loadAudioStream('https://rus.hitmotop.com/get/music/20201122/Neizvestnyjj_-_uvedomlenie_71698862.mp3')
 local IniFilename = 'fatalitytg.ini'
 local ini = inicfg.load({
@@ -90,6 +93,11 @@ local chatidbuffer = new.char[256]()
 local colorList = {'Красная', 'Зелёная','Синяя','Дефолт'}
 local colorListNumber = new.int()
 local colorListBuffer = new['const char*'][#colorList](colorList)
+local sizeX, sizeY = getScreenResolution()
+
+local new, str, sizeof = imgui.new, ffi.string, ffi.sizeof
+local renderWindow = new.bool()
+local inputField = new.char[256](--[[Здесь также следует кодировать информацию!]])
 
 theme = {
     {
@@ -1259,6 +1267,97 @@ function SoftBlueTheme()
     style.ButtonTextAlign = imgui.ImVec2(0.5, 0.5)
 end
 
+local server = sampGetCurrentServerName()
+
+local newFrame = imgui.OnFrame(
+    function() return renderWindow[0] end,
+    function(player)
+        imgui.SetNextWindowPos(imgui.ImVec2(sizeX / 2, sizeY / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+        imgui.SetNextWindowSize(imgui.ImVec2(800, 600), imgui.Cond.FirstUseEver)
+        imgui.Begin('##ScoreBoard', renderWindow, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize + imgui.WindowFlags.NoTitleBar + imgui.WindowFlags.NoScrollWithMouse + imgui.WindowFlags.NoScrollbar + imgui.WindowFlags.NoBringToFrontOnFocus)
+        imgui.Text('АДМИНКА 12 LVL ПРИ ВХОДЕ | МАРС, МЕБЕЛЬ')
+        imgui.SameLine(800 - 90)
+        imgui.Text('Players: ' .. sampGetPlayerCount(false))
+        imgui.Separator()
+        imgui.SameLine(0.1)
+        imgui.BeginChild("##scroll", imgui.ImVec2(800, 600), false)
+        imgui.Columns(4)
+        imgui.Separator()
+		imgui.SetColumnWidth(-1, 45); imgui.Text('ID'); imgui.NextColumn()
+        imgui.SetColumnWidth(-1, 580); imgui.Text('Nickname'); imgui.NextColumn()
+		imgui.SetColumnWidth(-1, 100); imgui.Text('Score'); imgui.NextColumn()
+		imgui.SetColumnWidth(-1, 55); imgui.Text('Ping'); imgui.NextColumn()
+        imgui.Separator()
+        local local_player_id = getLocalPlayerId()
+        drawScoreboardPlayer(local_player_id)
+        for i = 0, sampGetMaxPlayerId(false) do
+            if local_player_id ~= i and sampIsPlayerConnected(i) then
+                drawScoreboardPlayer(i)
+            end
+        end
+		imgui.Columns(1)
+        imgui.Separator()
+        imgui.EndChild()
+        imgui.End()
+    end
+)
+
+function drawScoreboardPlayer(id)
+    --imgui.BeginChild("##scroll", imgui.ImVec2(0, 0), false)
+	-- send scores&ping update?
+
+	local nickname = encoding.UTF8(sampGetPlayerNickname(id))
+	local score = sampGetPlayerScore(id)
+	local ping = sampGetPlayerPing(id)
+	local color = sampGetPlayerColor(id)
+	local r, g, b = bitex.bextract(color, 16, 8), bitex.bextract(color, 8, 8), bitex.bextract(color, 0, 8)
+	local imgui_RGBA = imgui.ImVec4(r / 255.0, g / 255.0, b / 255.0, 1)
+
+	if imgui.Selectable(tostring(id), id == focusId, imgui.SelectableFlags.SpanAllColumns + imgui.SelectableFlags.AllowDoubleClick) then
+		if imgui.IsMouseDoubleClicked(0) then
+			sampSendClickPlayer(id, 0)
+		else
+			focusId = focusId == id and -1 or id
+		end
+	end
+
+	if imgui.BeginPopupContextItem() then
+		imgui.TextColored(imgui_RGBA, nickname)
+
+		if imgui.Button('Скопировать ник') then
+			setClipboardText(nickname)
+			imgui.CloseCurrentPopup()
+		end
+
+		if nickname:find('_') then
+			if imgui.Button('Скопировать ник без "_"') then
+				setClipboardText(nickname:gsub('_', ' ', 1))
+				imgui.CloseCurrentPopup()
+			end
+		end
+
+        if imgui.Button('Сообщение') then
+            sampSetChatInputEnabled(true)
+            sampSetChatInputText('/pm '..id..' ')
+        end
+
+		imgui.EndPopup()
+	end
+
+	imgui.NextColumn()
+
+    imgui.TextColored(imgui_RGBA, nickname); imgui.NextColumn()
+	imgui.Text(tostring(score)); imgui.NextColumn()
+    imgui.Text(tostring(ping)); imgui.NextColumn()
+    --imgui.EndChild()
+end
+
+function getLocalPlayerId()
+	local _, id = sampGetPlayerIdByCharHandle(playerPed)
+	return id
+end
+
+
 function main()
     sampRegisterChatCommand('savec',function()
         local bool, x, y, z = getPlayerCoordinatesFixed()
@@ -1295,5 +1394,32 @@ function main()
         if wasKeyPressed(VK_R) and not sampIsCursorActive() then
             WinState[0] = not WinState[0]
         end
+    end
+end
+
+function onWindowMessage(msg, wparam, lparam)
+	if(msg == 0x100 or msg == 0x101) then
+		if wparam == VK_TAB and not isPauseMenuActive() then
+            consumeWindowMessage(true, false)
+            if not renderWindow[0] and msg == 0x100 then
+                renderWindow[0] = true
+                memory.write(467161840, 0, 4, false)
+            elseif renderWindow[0] and msg == 0x100 then
+                renderWindow[0] = false
+                memory.write(467161840, 2, 4, false)
+            end
+		end
+		if(wparam == VK_ESCAPE and renderWindow[0]) and not isPauseMenuActive() then
+			consumeWindowMessage(true, false)
+			if(msg == 0x101)then
+				renderWindow[0] = false
+			end
+		end
+	end
+end
+
+function onScriptTerminate(script, quit)
+    if script == thisScript() then
+        memory.write(467161840, 2, 4, false)
     end
 end
