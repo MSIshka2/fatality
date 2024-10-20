@@ -1,4 +1,4 @@
-script_version '1.2.4'
+script_version '1.2.5'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -232,7 +232,7 @@ theme = {
             imgui.GetStyle().Colors[imgui.Col.Text]                   = ImVec4(0.00, 0.00, 0.00, 1.00)
             imgui.GetStyle().Colors[imgui.Col.TextDisabled]           = ImVec4(0.00, 0.00, 0.00, 1.00)
             imgui.GetStyle().Colors[imgui.Col.WindowBg]               = ImVec4(1.00, 1.00, 1.00, 1.00)
-            imgui.GetStyle().Colors[imgui.Col.ChildBg]                = ImVec4(0.87, 0.87, 0.87, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ChildBg]                = ImVec4(0.67, 0.67, 0.67, 1.00)
             imgui.GetStyle().Colors[imgui.Col.PopupBg]                = ImVec4(0.06, 0.53, 0.68, 0.80)
             imgui.GetStyle().Colors[imgui.Col.Border]                 = ImVec4(0.43, 0.43, 0.50, 0.50)
             imgui.GetStyle().Colors[imgui.Col.BorderShadow]           = ImVec4(0.00, 0.00, 0.00, 0.00)
