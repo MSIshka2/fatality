@@ -1,4 +1,4 @@
-script_version '2.0.0'
+script_version '2.0.1'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -714,6 +714,18 @@ local commands9 = {
 }
 
 
+local oskm = {
+    currentm = 1,
+    "Еблан", "еблан", "ЕБЛАН", "Ебланы", "ебланы", "ЕБЛАНЫ", "Долбоёб", "долбоёб", "ДОЛБОЁБ", "Долбоёбы", "ДОЛБОЁБЫ", "долбоёбы", "Долбоеб", "долбоеб","ДОЛБОЕБ", "MQ", "mq", "Mq", "mQ", "Маме", "МАМЕ" , "маме", "МАМУ", "маму", "Маму",
+    "Пидор", "пидор", "ПИДОР" , "Пидоры", "пидоры", "ПИДОРЫ" , "Пидорас", "пидорас", "Пидорасы", "ПИДОРАСЫ", "ЧМО", "чмо", "Чмо", "Чмошник", "чмошник", "ЧМОШНИК", "МРАЗЬ", "Мразь", "мразь", "Тварь", "ТВАРЬ", "тварь", "Шлюха", "ШЛЮХА",
+    "шлюха", "Мудак", "МУДАК", "мудак", "МУДАКИ", "мудаки", "Мудаки"
+}
+local nicki = {
+    currentn = 1,
+    "Svyatik_Mironov", "svyatik_mironov", "Andrey_Holkin", "andrey_holkin", "Denis_Angelov", "denis_angelov", "Harry_Pattersone", "harry_pattersone", "Klayc_Holkin", "klayc_holkin", "Justin_Biever", "justin_biever",
+    "Lucas_Oldman", "lucas_oldman", "Devin_Martynov", "devin_martynov", "kevin_legens", "Kevin_Legens", "Ywo_Legend", "ywo_legend", "Akito_Ito", "akito_ito", "navalny_vandal", "Navalny_Vandal", "Yuto_Hasegawa", "yuto_hasegawa"
+}
+
 local updateid
 function threadHandle(runner, url, args, resolve, reject)
     local t = runner(url, args)
@@ -842,7 +854,6 @@ function getLastUpdate() -- тут мы получаем последний ID �
     end)
 end
 
-
 function sampev.onServerMessage(color, text)
     if act then
         local playerid2 = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
@@ -857,42 +868,6 @@ function sampev.onServerMessage(color, text)
             sendTelegramNotification(text)
         end
         if text:find(u8:decode("для%s".. name)) then
-            sendTelegramNotification(text)
-        end
-        if text:find(u8:decode("Еблан")) or text:find(u8:decode("еблан")) then
-            sendTelegramNotification(text)
-        end
-        if text:find(u8:decode("Долбаёб")) or text:find(u8:decode("долбаёб")) then
-            sendTelegramNotification(text)
-        end
-        if text:find(u8:decode("Долбаеб")) or text:find(u8:decode("долбаеб")) then
-            sendTelegramNotification(text)
-        end
-        if text:find(u8:decode("MQ")) or text:find(u8:decode("mq")) then
-            sendTelegramNotification(text)
-        end
-        if text:find(u8:decode("Маме")) or text:find(u8:decode("маме")) then
-            sendTelegramNotification(text)
-        end
-        if text:find(u8:decode("Маму")) or text:find(u8:decode("маму")) then
-            sendTelegramNotification(text)
-        end
-        if text:find(u8:decode("Шлюха")) or text:find(u8:decode("шлюха")) then
-            sendTelegramNotification(text)
-        end
-        if text:find(u8:decode("Пидорас")) or text:find(u8:decode("пидорас")) then
-            sendTelegramNotification(text)
-        end
-        if text:find(u8:decode("Мудак")) or text:find(u8:decode("мудак")) then
-            sendTelegramNotification(text)
-        end
-        if text:find(u8:decode("Тварь")) or text:find(u8:decode("тварь")) then
-            sendTelegramNotification(text)
-        end
-        if text:find(u8:decode("Чмошник")) or text:find(u8:decode("чмошник")) then
-            sendTelegramNotification(text)
-        end
-        if text:find(u8:decode("Чмо")) or text:find(u8:decode("чмо")) then
             sendTelegramNotification(text)
         end
         if text:find(u8:decode("Администратор%s".. "Svyatik_Mironov%s".. "кикнул")) or text:find(u8:decode("Администратор%s".. "svyatik_mironov".. "кикнул")) then
@@ -912,6 +887,19 @@ function sampev.onServerMessage(color, text)
         end
         if text:find(u8:decode("Администратор%s".. "Ywo_Legend%s".. "забанил")) or text:find(u8:decode("Администратор%s".. "ywo_legend%s".. "забанил")) then
             sendTelegramNotification(text)
+        end
+        for i, osk in ipairs(oskm) do
+            oskm.currentm = i
+            if text:find(u8:decode(osk)) then
+                sendTelegramNotification(text)
+                break
+            end
+        end
+        for i, nicks in ipairs(nicki) do
+            if text:find(u8:decode(nicks .. "%s" .. "подключился%sк%sсерверу")) then
+                sendTelegramNotification(text)
+                break
+            end
         end
     end
 end
