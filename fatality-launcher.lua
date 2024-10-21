@@ -1,4 +1,4 @@
-script_version '1.3.2'
+script_version '1.3.3'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -16,18 +16,17 @@ local inicfg = require('inicfg')
 local ffi = require('ffi')
 local bitex = require 'bitex'
 local memory = require 'memory'
-local sound = loadAudioStream('https://rus.hitmotop.com/get/music/20201122/Neizvestnyjj_-_uvedomlenie_71698862.mp3')
 local IniFilename = 'fatalitytg.ini'
 local ini = inicfg.load({
     telegramtc = {
         token = 'token',
         chat_id = 'chat_id',
-        theme = 4
+        theme = 4,
+        style = 1,
+        hp = false
     }
 }, IniFilename)
 inicfg.save(ini, IniFilename)
-
-assert(sound, 'File not found!')
 
 function update()
     local updatePath = os.getenv('TEMP')..'\\Update.json'
@@ -90,9 +89,12 @@ local status = false
 local status1 = false
 local tokenbuffer = new.char[256]()
 local chatidbuffer = new.char[256]()
-local colorList = {'Красная', 'Зелёная','Синяя','Дефолт'}
+local colorList = {'Красная', 'Зелёная','Бело-синяя','Чёрно-фиолетовая','Дефолт', 'CS 1.6'}
 local colorListNumber = new.int()
 local colorListBuffer = new['const char*'][#colorList](colorList)
+local styleList = {'Дефолт', 'Стиль 1','Стиль2', 'CS 1.6'}
+local styleListNumber = new.int()
+local styleListBuffer = new['const char*'][#styleList](styleList)
 
 theme = {
     {
@@ -101,7 +103,7 @@ theme = {
             imgui.SwitchContext()
             imgui.GetStyle().Colors[imgui.Col.Text]                   = ImVec4(1.00, 1.00, 1.00, 1.00)
             imgui.GetStyle().Colors[imgui.Col.TextDisabled]           = ImVec4(0.50, 0.50, 0.50, 1.00)
-            imgui.GetStyle().Colors[imgui.Col.WindowBg]               = ImVec4(0.06, 0.06, 0.06, 0.94)
+            imgui.GetStyle().Colors[imgui.Col.WindowBg]               = ImVec4(0.10, 0.06, 0.06, 1.00)
             imgui.GetStyle().Colors[imgui.Col.ChildBg]                = ImVec4(1.00, 1.00, 1.00, 0.00)
             imgui.GetStyle().Colors[imgui.Col.PopupBg]                = ImVec4(0.08, 0.08, 0.08, 0.94)
             imgui.GetStyle().Colors[imgui.Col.Border]                 = ImVec4(0.43, 0.43, 0.50, 0.50)
@@ -247,6 +249,55 @@ theme = {
         change = function()
             local ImVec4 = imgui.ImVec4
             imgui.SwitchContext()
+            imgui.GetStyle().Colors[imgui.Col.Text]                   = ImVec4(1.00, 1.00, 1.00, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TextDisabled]           = ImVec4(0.50, 0.50, 0.50, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.WindowBg]               = ImVec4(0.06, 0.06, 0.06, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ChildBg]                = ImVec4(1.00, 1.00, 1.00, 0.00)
+            imgui.GetStyle().Colors[imgui.Col.PopupBg]                = ImVec4(0.08, 0.08, 0.08, 0.94)
+            imgui.GetStyle().Colors[imgui.Col.Border]                 = ImVec4(0.35, 0.06, 0.35, 0.50)
+            imgui.GetStyle().Colors[imgui.Col.BorderShadow]           = ImVec4(0.00, 0.00, 0.00, 0.00)
+            imgui.GetStyle().Colors[imgui.Col.FrameBg]                = ImVec4(0.35, 0.06, 0.25, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.FrameBgHovered]         = ImVec4(0.50, 0.06, 0.50, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.FrameBgActive]          = ImVec4(0.50, 0.06, 0.50, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TitleBg]                = ImVec4(0.04, 0.04, 0.04, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TitleBgActive]          = ImVec4(0.50, 0.06, 0.50, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TitleBgCollapsed]       = ImVec4(0.00, 0.00, 0.00, 0.51)
+            imgui.GetStyle().Colors[imgui.Col.MenuBarBg]              = ImVec4(0.14, 0.14, 0.14, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ScrollbarBg]            = ImVec4(0.02, 0.02, 0.02, 0.53)
+            imgui.GetStyle().Colors[imgui.Col.ScrollbarGrab]          = ImVec4(0.31, 0.31, 0.31, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ScrollbarGrabHovered]   = ImVec4(0.41, 0.41, 0.41, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ScrollbarGrabActive]    = ImVec4(0.51, 0.51, 0.51, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.CheckMark]              = ImVec4(0.70, 0.06, 0.70, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.SliderGrab]             = ImVec4(0.88, 0.26, 0.24, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.SliderGrabActive]       = ImVec4(0.98, 0.26, 0.26, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.Button]                 = ImVec4(0.35, 0.06, 0.25, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ButtonHovered]          = ImVec4(0.50, 0.06, 0.50, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ButtonActive]           = ImVec4(0.50, 0.06, 0.50, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.Header]                 = ImVec4(0.50, 0.06, 0.50, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.HeaderHovered]          = ImVec4(0.45, 0.06, 0.45, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.HeaderActive]           = ImVec4(0.98, 0.26, 0.26, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.Separator]              = ImVec4(0.43, 0.43, 0.50, 0.50)
+            imgui.GetStyle().Colors[imgui.Col.SeparatorHovered]       = ImVec4(0.75, 0.10, 0.10, 0.78)
+            imgui.GetStyle().Colors[imgui.Col.SeparatorActive]        = ImVec4(0.75, 0.10, 0.10, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ResizeGrip]             = ImVec4(0.98, 0.26, 0.26, 0.25)
+            imgui.GetStyle().Colors[imgui.Col.ResizeGripHovered]      = ImVec4(0.98, 0.26, 0.26, 0.67)
+            imgui.GetStyle().Colors[imgui.Col.ResizeGripActive]       = ImVec4(0.98, 0.26, 0.26, 0.95)
+            imgui.GetStyle().Colors[imgui.Col.Tab]                    = ImVec4(0.35, 0.06, 0.25, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TabHovered]             = ImVec4(0.50, 0.06, 0.50, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TabActive]              = ImVec4(0.45, 0.06, 0.46, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TabUnfocused]           = ImVec4(0.98, 0.26, 0.26, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TabUnfocusedActive]     = ImVec4(0.98, 0.26, 0.26, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.PlotLines]              = ImVec4(0.61, 0.61, 0.61, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.PlotLinesHovered]       = ImVec4(1.00, 0.43, 0.35, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.PlotHistogram]          = ImVec4(0.90, 0.70, 0.00, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.PlotHistogramHovered]   = ImVec4(1.00, 0.60, 0.00, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TextSelectedBg]         = ImVec4(0.98, 0.26, 0.26, 0.35)
+        end
+    },
+    {
+        change = function()
+            local ImVec4 = imgui.ImVec4
+            imgui.SwitchContext()
             imgui.GetStyle().Colors[imgui.Col.Text]                   = ImVec4(0.90, 0.90, 0.93, 1.00)
             imgui.GetStyle().Colors[imgui.Col.TextDisabled]           = ImVec4(0.40, 0.40, 0.45, 1.00)
             imgui.GetStyle().Colors[imgui.Col.WindowBg]               = ImVec4(0.12, 0.12, 0.14, 1.00)
@@ -290,8 +341,165 @@ theme = {
             imgui.GetStyle().Colors[imgui.Col.TabHovered]             = ImVec4(0.60, 0.60, 0.90, 1.00)
             imgui.GetStyle().Colors[imgui.Col.TabActive]              = ImVec4(0.28, 0.56, 0.96, 1.00)
         end
+    },
+    {
+        change = function()
+            local ImVec4 = imgui.ImVec4
+            imgui.SwitchContext()
+            imgui.GetStyle().Colors[imgui.Col.Text]                   = ImVec4(1.00, 1.00, 1.00, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TextDisabled]           = ImVec4(0.50, 0.50, 0.50, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.WindowBg]               = ImVec4(0.29, 0.34, 0.26, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ChildBg]                = ImVec4(0.29, 0.34, 0.26, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.PopupBg]                = ImVec4(0.24, 0.27, 0.20, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.Border]                 = ImVec4(0.54, 0.57, 0.51, 0.50)
+            imgui.GetStyle().Colors[imgui.Col.BorderShadow]           = ImVec4(0.14, 0.16, 0.11, 0.52)
+            imgui.GetStyle().Colors[imgui.Col.FrameBg]                = ImVec4(0.24, 0.27, 0.20, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.FrameBgHovered]         = ImVec4(0.27, 0.30, 0.23, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.FrameBgActive]          = ImVec4(0.00, 0.00, 0.00, 0.51)
+            imgui.GetStyle().Colors[imgui.Col.TitleBg]                = ImVec4(0.24, 0.27, 0.20, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TitleBgActive]          = ImVec4(0.29, 0.34, 0.26, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TitleBgCollapsed]       = ImVec4(0.00, 0.00, 0.00, 0.51)
+            imgui.GetStyle().Colors[imgui.Col.MenuBarBg]              = ImVec4(0.24, 0.27, 0.20, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ScrollbarBg]            = ImVec4(0.35, 0.42, 0.31, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ScrollbarGrab]          = ImVec4(0.28, 0.32, 0.24, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ScrollbarGrabHovered]   = ImVec4(0.25, 0.30, 0.22, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ScrollbarGrabActive]    = ImVec4(0.23, 0.27, 0.21, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.CheckMark]              = ImVec4(0.59, 0.54, 0.18, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.SliderGrab]             = ImVec4(0.35, 0.42, 0.31, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.SliderGrabActive]       = ImVec4(0.54, 0.57, 0.51, 0.50)
+            imgui.GetStyle().Colors[imgui.Col.Button]                 = ImVec4(0.29, 0.34, 0.26, 0.40)
+            imgui.GetStyle().Colors[imgui.Col.ButtonHovered]          = ImVec4(0.35, 0.42, 0.31, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ButtonActive]           = ImVec4(0.54, 0.57, 0.51, 0.50)
+            imgui.GetStyle().Colors[imgui.Col.Header]                 = ImVec4(0.35, 0.42, 0.31, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.HeaderHovered]          = ImVec4(0.35, 0.42, 0.31, 0.6)
+            imgui.GetStyle().Colors[imgui.Col.HeaderActive]           = ImVec4(0.54, 0.57, 0.51, 0.50)
+            imgui.GetStyle().Colors[imgui.Col.Separator]              = ImVec4(0.14, 0.16, 0.11, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.SeparatorHovered]       = ImVec4(0.54, 0.57, 0.51, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.SeparatorActive]        = ImVec4(0.59, 0.54, 0.18, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ResizeGrip]             = ImVec4(0.19, 0.23, 0.18, 0.00)
+            imgui.GetStyle().Colors[imgui.Col.ResizeGripHovered]      = ImVec4(0.54, 0.57, 0.51, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.ResizeGripActive]       = ImVec4(0.59, 0.54, 0.18, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.Tab]                    = ImVec4(0.35, 0.42, 0.31, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TabHovered]             = ImVec4(0.54, 0.57, 0.51, 0.78)
+            imgui.GetStyle().Colors[imgui.Col.TabActive]              = ImVec4(0.59, 0.54, 0.18, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TabUnfocused]           = ImVec4(0.24, 0.27, 0.20, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TabUnfocusedActive]     = ImVec4(0.35, 0.42, 0.31, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.PlotLines]              = ImVec4(0.61, 0.61, 0.61, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.PlotLinesHovered]       = ImVec4(0.59, 0.54, 0.18, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.PlotHistogram]          = ImVec4(1.00, 0.78, 0.28, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.PlotHistogramHovered]   = ImVec4(1.00, 0.60, 0.00, 1.00)
+            imgui.GetStyle().Colors[imgui.Col.TextSelectedBg]         = ImVec4(0.59, 0.54, 0.18, 1.00)
+        end
     }
     
+    
+}
+
+style = {
+    {
+        change = function()
+            imgui.SwitchContext()
+            local style = imgui.GetStyle()
+            style.WindowPadding = imgui.ImVec2(15, 15)
+            style.WindowRounding = 10.0
+            style.ChildRounding = 6.0
+            style.FramePadding = imgui.ImVec2(8, 7)
+            style.FrameRounding = 8.0
+            style.ItemSpacing = imgui.ImVec2(8, 8)
+            style.ItemInnerSpacing = imgui.ImVec2(10, 6)
+            style.IndentSpacing = 25.0
+            style.ScrollbarSize = 13.0
+            style.ScrollbarRounding = 12.0
+            style.GrabMinSize = 10.0
+            style.GrabRounding = 6.0
+            style.PopupRounding = 8
+            style.WindowTitleAlign = imgui.ImVec2(0.5, 0.5)
+            style.ButtonTextAlign = imgui.ImVec2(0.5, 0.5)
+            style.WindowBorderSize = 1
+            style.ChildBorderSize = 1
+            style.PopupBorderSize = 1
+            style.FrameBorderSize = 1
+            style.TabBorderSize = 1
+        end
+    },
+    {
+        change = function()
+            imgui.SwitchContext()
+            local style = imgui.GetStyle()
+            style.WindowPadding = imgui.ImVec2(15, 15)
+            style.WindowRounding = 3.0
+            style.ChildRounding = 3.0
+            style.FramePadding = imgui.ImVec2(8, 7)
+            style.FrameRounding = 3.0
+            style.ItemSpacing = imgui.ImVec2(8, 8)
+            style.ItemInnerSpacing = imgui.ImVec2(10, 6)
+            style.IndentSpacing = 25.0
+            style.ScrollbarSize = 13.0
+            style.ScrollbarRounding = 1.0
+            style.GrabMinSize = 10.0
+            style.GrabRounding = 3.0
+            style.PopupRounding = 3
+            style.WindowTitleAlign = imgui.ImVec2(0.5, 0.5)
+            style.ButtonTextAlign = imgui.ImVec2(0.5, 0.5)
+            style.WindowBorderSize = 1
+            style.ChildBorderSize = 1
+            style.PopupBorderSize = 1
+            style.FrameBorderSize = 1
+            style.TabBorderSize = 1
+        end
+    },
+    {
+        change = function()
+            imgui.SwitchContext()
+            local style = imgui.GetStyle()
+            style.WindowPadding = imgui.ImVec2(15, 15)
+            style.WindowRounding = 20.0
+            style.ChildRounding = 12.0
+            style.FramePadding = imgui.ImVec2(8, 7)
+            style.FrameRounding = 16.0
+            style.ItemSpacing = imgui.ImVec2(8, 8)
+            style.ItemInnerSpacing = imgui.ImVec2(10, 6)
+            style.IndentSpacing = 25.0
+            style.ScrollbarSize = 13.0
+            style.ScrollbarRounding = 24.0
+            style.GrabMinSize = 10.0
+            style.GrabRounding = 12.0
+            style.PopupRounding = 16
+            style.WindowTitleAlign = imgui.ImVec2(0.5, 0.5)
+            style.ButtonTextAlign = imgui.ImVec2(0.5, 0.5)
+            style.WindowBorderSize = 1
+            style.ChildBorderSize = 1
+            style.PopupBorderSize = 1
+            style.FrameBorderSize = 1
+            style.TabBorderSize = 1
+        end
+    },
+    {
+        change = function()
+            imgui.SwitchContext()
+            local style = imgui.GetStyle()
+            style.ItemSpacing = imgui.ImVec2(5, 5)
+            style.ItemInnerSpacing = imgui.ImVec2(2, 2)
+            style.TouchExtraPadding = imgui.ImVec2(0, 0)
+            style.IndentSpacing = 0
+            style.ScrollbarSize = 10
+            style.GrabMinSize = 10
+            style.WindowBorderSize = 1
+            style.ChildBorderSize = 1
+            style.PopupBorderSize = 1
+            style.FrameBorderSize = 1
+            style.TabBorderSize = 1
+            style.WindowRounding = 0
+            style.ChildRounding = 0
+            style.FrameRounding = 0
+            style.PopupRounding = 0
+            style.ScrollbarRounding = 0
+            style.GrabRounding = 0
+            style.TabRounding = 0
+            style.WindowTitleAlign = imgui.ImVec2(0.5, 0.5)
+            style.ButtonTextAlign = imgui.ImVec2(0.5, 0.5)
+        end
+    }
 }
 
 
@@ -644,8 +852,6 @@ function sampev.onServerMessage(color, text)
             notify.addNotification(string.format(u8:decode("Новое сообщение\n\n %s"), text), 30)
             sendTelegramNotification(text)
             addOneOffSound(0.0, 0.0, 0.0, 1054)
-            setAudioStreamVolume(sound, 10)
-            setAudioStreamState(sound, 1)
         end
         if text:find(u8:decode("@") .. name ) then
             sendTelegramNotification(text)
@@ -827,10 +1033,11 @@ end
 
 function sampev.onSetPlayerHealth(health)
     local playerid = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
-    if health < 30 and hp == true then
+    health = 8000100-8000000
+    if health < 8000030 and hp == true then
         sampSendChat('/hp ' .. playerid)
     end
-    if health ~= 0 and hp == true then
+    if health ~= 8000000 and hp == true then
         lua_thread.create(function()
         hp = false
         wait(6000)
@@ -853,6 +1060,33 @@ imgui.OnInitialize(function()
     if ini.telegramtc.theme == 3 then
         theme[colorListNumber[0]+4].change()
     end
+    if ini.telegramtc.theme == 4 then
+        theme[colorListNumber[0]+5].change()
+    end
+    if ini.telegramtc.theme == 5 then
+        theme[colorListNumber[0]+6].change()
+    end
+    if ini.telegramtc.style == 0 then
+        style[styleListNumber[0]+1].change()
+    end
+    if ini.telegramtc.style == 1 then
+        style[styleListNumber[0]+2].change()
+    end
+    if ini.telegramtc.style == 2 then
+        style[styleListNumber[0]+3].change()
+    end
+    if ini.telegramtc.style == 3 then
+        style[styleListNumber[0]+4].change()
+    end
+    if ini.telegramtc.hp == false then
+        checkboxone[0] = false
+        hp = false
+    end
+    if ini.telegramtc.hp == true then
+        checkboxone[0] = true
+        hp = true
+    end
+
 end)
 
 imgui.OnFrame(function() return WinState[0] end, function(player)
@@ -874,8 +1108,12 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             imgui.SetCursorPos(imgui.ImVec2(155, 80.0))
             imgui.Checkbox('Авто-ХП', checkboxone)
             if checkboxone[0] == true then
+                ini.telegramtc.hp = true
+                inicfg.save(ini,IniFilename)
                 hp = true
             else
+                ini.telegramtc.hp = false
+                inicfg.save(ini,IniFilename)
                 hp = false
             end
             if imgui.IsItemHovered() then
@@ -888,6 +1126,11 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 ini.telegramtc.theme = colorListNumber[0]
                 inicfg.save(ini, IniFilename)
             end
+            if imgui.Combo('Стили',styleListNumber,styleListBuffer, #styleList) then
+                style[styleListNumber[0]+1].change()
+                ini.telegramtc.style = styleListNumber[0]
+                inicfg.save(ini, IniFilename)
+            end
             if imgui.Button('Обновить скрипт') then
                 update()
             end
@@ -896,11 +1139,11 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                     imgui.TextWrapped(msg)
                 end
                 imgui.EndPopup()
-                imgui.SetCursorPos(imgui.ImVec2(checkx[0]-485, checky[0]+200))
+                imgui.SetCursorPos(imgui.ImVec2(checkx[0]-485, checky[0]+230))
             if imgui.Button('Очистить') then
                 messages = {}
             end
-            imgui.SetCursorPos(imgui.ImVec2(checkx[0]-400, checky[0]+200.5))
+            imgui.SetCursorPos(imgui.ImVec2(checkx[0]-400, checky[0]+230.5))
             if imgui.Button('Настройки') then
                 imgui.OpenPopup('Settings')
             end
@@ -914,7 +1157,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.EndPopup()
             end
             imgui.SameLine()
-            imgui.SetCursorPos(imgui.ImVec2(210, 347))
+            imgui.SetCursorPos(imgui.ImVec2(210, 377))
             imgui.TextQuestion("(?)", "Author: Harry_Pattersone")
             imgui.EndTabItem()
         end
