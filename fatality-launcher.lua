@@ -1,4 +1,4 @@
-script_version '1.3.3'
+script_version '1.3.4'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -857,6 +857,45 @@ function sampev.onServerMessage(color, text)
             sendTelegramNotification(text)
         end
         if text:find(u8:decode("для%s".. name)) then
+            sendTelegramNotification(text)
+        end
+        if text:find(u8:decode("Еблан")) or text:find(u8:decode("еблан")) then
+            sendTelegramNotification(text)
+        end
+        if text:find(u8:decode("Долбаёб")) or text:find(u8:decode("долбаёб")) then
+            sendTelegramNotification(text)
+        end
+        if text:find(u8:decode("Долбаеб")) or text:find(u8:decode("долбаеб")) then
+            sendTelegramNotification(text)
+        end
+        if text:find(u8:decode("MQ")) or text:find(u8:decode("mq")) then
+            sendTelegramNotification(text)
+        end
+        if text:find(u8:decode("Маме")) or text:find(u8:decode("маме")) then
+            sendTelegramNotification(text)
+        end
+        if text:find(u8:decode("Маму")) or text:find(u8:decode("маму")) then
+            sendTelegramNotification(text)
+        end
+        if text:find(u8:decode("Шлюха")) or text:find(u8:decode("шлюха")) then
+            sendTelegramNotification(text)
+        end
+        if text:find(u8:decode("Пидорас")) or text:find(u8:decode("пидорас")) then
+            sendTelegramNotification(text)
+        end
+        if text:find(u8:decode("Мудак")) or text:find(u8:decode("мудак")) then
+            sendTelegramNotification(text)
+        end
+        if text:find(u8:decode("Тварь")) or text:find(u8:decode("тварь")) then
+            sendTelegramNotification(text)
+        end
+        if text:find(u8:decode("Чмошник")) or text:find(u8:decode("чмошник")) then
+            sendTelegramNotification(text)
+        end
+        if text:find(u8:decode("Чмо")) or text:find(u8:decode("чмо")) then
+            sendTelegramNotification(text)
+        end
+        if text:find(u8:decode("Сервер")) or text:find(u8:decode("сервер")) then
             sendTelegramNotification(text)
         end
         if text:find(u8:decode("Администратор%s".. "Svyatik_Mironov%s".. "кикнул")) or text:find(u8:decode("Администратор%s".. "svyatik_mironov".. "кикнул")) then
