@@ -1,4 +1,4 @@
-script_version '1.3.4'
+script_version '1.4.0'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -893,9 +893,6 @@ function sampev.onServerMessage(color, text)
             sendTelegramNotification(text)
         end
         if text:find(u8:decode("Чмо")) or text:find(u8:decode("чмо")) then
-            sendTelegramNotification(text)
-        end
-        if text:find(u8:decode("Сервер")) or text:find(u8:decode("сервер")) then
             sendTelegramNotification(text)
         end
         if text:find(u8:decode("Администратор%s".. "Svyatik_Mironov%s".. "кикнул")) or text:find(u8:decode("Администратор%s".. "svyatik_mironov".. "кикнул")) then
