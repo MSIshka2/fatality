@@ -1,4 +1,4 @@
-script_version '2.0.1'
+script_version '2.0.2'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -723,7 +723,8 @@ local oskm = {
 local nicki = {
     currentn = 1,
     "Svyatik_Mironov", "svyatik_mironov", "Andrey_Holkin", "andrey_holkin", "Denis_Angelov", "denis_angelov", "Harry_Pattersone", "harry_pattersone", "Klayc_Holkin", "klayc_holkin", "Justin_Biever", "justin_biever",
-    "Lucas_Oldman", "lucas_oldman", "Devin_Martynov", "devin_martynov", "kevin_legens", "Kevin_Legens", "Ywo_Legend", "ywo_legend", "Akito_Ito", "akito_ito", "navalny_vandal", "Navalny_Vandal", "Yuto_Hasegawa", "yuto_hasegawa"
+    "Lucas_Oldman", "lucas_oldman", "Devin_Martynov", "devin_martynov", "kevin_legens", "Kevin_Legens", "Ywo_Legend", "ywo_legend", "Akito_Ito", "akito_ito", "navalny_vandal", "Navalny_Vandal", "Yuto_Hasegawa", "yuto_hasegawa",
+    "Harry_Test"
 }
 
 local updateid
@@ -896,7 +897,7 @@ function sampev.onServerMessage(color, text)
             end
         end
         for i, nicks in ipairs(nicki) do
-            if text:find(u8:decode(nicks .. "%s" .. "подключился%sк%sсерверу")) then
+            if text:find(u8:decode("Name:%s" .. nicks)) then
                 sendTelegramNotification(text)
                 break
             end
