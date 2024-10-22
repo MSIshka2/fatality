@@ -1,4 +1,4 @@
-script_version '2.0.2'
+script_version '2.0.3'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -1456,6 +1456,93 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                     imgui.EndPopup()
                 end
         
+            end
+            imgui.EndTabItem()
+        end
+        if imgui.BeginTabItem('Ответы') then
+            if imgui.Button('Повышение админки') then
+                imgui.OpenPopup('ADM')
+            end
+            if imgui.BeginPopup('ADM') then
+                imgui.BeginChild('ADM', imgui.ImVec2(300,200), true)
+                if imgui.Button('/a') then
+                    sampSendChat(u8:decode('/a Повысить адм можно: /talons /case /ferma'))
+                end
+                if imgui.Button('Обычный чат') then
+                    sampSendChat(u8:decode('Повысить адм можно: /quest /talons /case /ferma'))
+                end
+                imgui.EndChild()
+                imgui.EndPopup()
+            end
+            if imgui.Button('Получение REP') then
+                imgui.OpenPopup('REP')
+            end
+            if imgui.BeginPopup('REP') then
+                imgui.BeginChild('REP', imgui.ImVec2(300,200), true)
+                if imgui.Button('/a') then
+                    sampSendChat(u8:decode('/a Получить REP можно: /tasks /gps > По работе /sha'))
+                end
+                if imgui.Button('Обычный чат') then
+                    sampSendChat(u8:decode('Получить REP можно: /tasks /gps > По работе /sha'))
+                end
+                imgui.EndChild()
+                imgui.EndPopup()
+            end
+            if imgui.Button('Казино') then
+                imgui.OpenPopup('Casino')
+            end
+            if imgui.BeginPopup('Casino') then
+                imgui.BeginChild('Casino', imgui.ImVec2(300,200), true)
+                if imgui.Button('/a') then
+                    sampSendChat(u8:decode('/a Казино находится: /gps > Бизнесы > Казино "Лос-Сантос"'))
+                end
+                if imgui.Button('Обычный чат') then
+                    sampSendChat(u8:decode('Казино находится: /gps > Бизнесы > Казино "Лос-Сантос"'))
+                end
+                imgui.EndChild()
+                imgui.EndPopup()
+            end
+            if imgui.Button('Двигатель') then
+                imgui.OpenPopup('Engine')
+            end
+            if imgui.BeginPopup('Engine') then
+                imgui.BeginChild('Engine', imgui.ImVec2(300,200), true)
+                if imgui.Button('/a') then
+                    sampSendChat(u8:decode('/a Завести транспорт можно: на кнопку "2", командой /en'))
+                end
+                if imgui.Button('Обычный чат') then
+                    sampSendChat(u8:decode('Завести транспорт можно: на кнопку "2", командой /en'))
+                end
+                imgui.EndChild()
+                imgui.EndPopup()
+            end
+            if imgui.Button('Купить админку') then
+                imgui.OpenPopup('Buyadm')
+            end
+            if imgui.BeginPopup('Buyadm') then
+                imgui.BeginChild('Buyadm', imgui.ImVec2(300,200), true)
+                if imgui.Button('/a') then
+                    sampSendChat(u8:decode('/a Узнать цены на адм. права можно по команде /buyadm'))
+                end
+                if imgui.Button('Обычный чат') then
+                    sampSendChat(u8:decode('Узнать цены на адм. права можно по команде /buyadm'))
+                end
+                imgui.EndChild()
+                imgui.EndPopup()
+            end
+            if imgui.Button('Инфо') then
+                imgui.OpenPopup('Info')
+            end
+            if imgui.BeginPopup('Info') then
+                imgui.BeginChild('Info', imgui.ImVec2(300,200), true)
+                if imgui.Button('/a') then
+                    sampSendChat(u8:decode('/a Узнать информацию о сер вере можно по команде /info'))
+                end
+                if imgui.Button('Обычный чат') then
+                    sampSendChat(u8:decode('Узнать информацию о сер вере можно по команде /info'))
+                end
+                imgui.EndChild()
+                imgui.EndPopup()
             end
             imgui.EndTabItem()
         end
