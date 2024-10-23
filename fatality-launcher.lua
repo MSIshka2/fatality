@@ -1,4 +1,4 @@
-script_version '2.0.3'
+script_version '2.0.4'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -95,6 +95,7 @@ local colorListBuffer = new['const char*'][#colorList](colorList)
 local styleList = {'Дефолт', 'Стиль 1','Стиль2', 'CS 1.6'}
 local styleListNumber = new.int()
 local styleListBuffer = new['const char*'][#styleList](styleList)
+local gm = false
 
 theme = {
     {
@@ -889,6 +890,9 @@ function sampev.onServerMessage(color, text)
         if text:find(u8:decode("Администратор%s".. "Ywo_Legend%s".. "забанил")) or text:find(u8:decode("Администратор%s".. "ywo_legend%s".. "забанил")) then
             sendTelegramNotification(text)
         end
+        if text:find(u8:decode("Вы%sполучили%sбан%sчата")) then
+            sampSendChat('/unmute ' .. playerid2)
+        end
         for i, osk in ipairs(oskm) do
             oskm.currentm = i
             if text:find(u8:decode(osk)) then
@@ -1056,21 +1060,6 @@ local function spawnPlayer()
     sampSendChat('/skin ' .. id)
 end
 
-function sampev.onSetPlayerHealth(health)
-    local playerid = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
-    health = 8000100-8000000
-    if health < 8000030 and hp == true then
-        sampSendChat('/hp ' .. playerid)
-    end
-    if health ~= 8000000 and hp == true then
-        lua_thread.create(function()
-        hp = false
-        wait(6000)
-        hp = true
-        end)
-    end
-end
-
 imgui.OnInitialize(function()
     SoftBlueTheme()
     if ini.telegramtc.theme == 0 then
@@ -1103,14 +1092,6 @@ imgui.OnInitialize(function()
     if ini.telegramtc.style == 3 then
         style[styleListNumber[0]+4].change()
     end
-    if ini.telegramtc.hp == false then
-        checkboxone[0] = false
-        hp = false
-    end
-    if ini.telegramtc.hp == true then
-        checkboxone[0] = true
-        hp = true
-    end
 
 end)
 
@@ -1127,23 +1108,6 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.Text('1. /re <любой игрок>')
                 imgui.Text('2. Выйдите из /re')
                 imgui.Text('3. Нажмите кнопку спавна')
-                imgui.EndTooltip()
-            end
-            imgui.SameLine()
-            imgui.SetCursorPos(imgui.ImVec2(155, 80.0))
-            imgui.Checkbox('Авто-ХП', checkboxone)
-            if checkboxone[0] == true then
-                ini.telegramtc.hp = true
-                inicfg.save(ini,IniFilename)
-                hp = true
-            else
-                ini.telegramtc.hp = false
-                inicfg.save(ini,IniFilename)
-                hp = false
-            end
-            if imgui.IsItemHovered() then
-                imgui.BeginTooltip()
-                imgui.Text('Восполняет хп, если у вас меньше 30 хп')
                 imgui.EndTooltip()
             end
             if imgui.Combo('Темы',colorListNumber,colorListBuffer, #colorList) then
@@ -1474,6 +1438,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.EndChild()
                 imgui.EndPopup()
             end
+            imgui.SameLine()
             if imgui.Button('Получение REP') then
                 imgui.OpenPopup('REP')
             end
@@ -1502,6 +1467,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.EndChild()
                 imgui.EndPopup()
             end
+            imgui.SameLine()
             if imgui.Button('Двигатель') then
                 imgui.OpenPopup('Engine')
             end
@@ -1526,6 +1492,50 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 end
                 if imgui.Button('Обычный чат') then
                     sampSendChat(u8:decode('Узнать цены на адм. права можно по команде /buyadm'))
+                end
+                imgui.EndChild()
+                imgui.EndPopup()
+            end
+            imgui.SameLine()
+            if imgui.Button('Покупка аксов') then
+                imgui.OpenPopup('Acs')
+            end
+            if imgui.BeginPopup('Acs') then
+                imgui.BeginChild('Acs', imgui.ImVec2(300,200), true)
+                if imgui.Button('/a') then
+                    sampSendChat(u8:decode('/a Купить аксы можно: /vkcoin /gps > Бизнесы > Парикмахерская'))
+                end
+                if imgui.Button('Обычный чат') then
+                    sampSendChat(u8:decode('Купить аксы можно: /vkcoin /gps > Бизнесы > Парикмахерская'))
+                end
+                imgui.EndChild()
+                imgui.EndPopup()
+            end
+            if imgui.Button('Выдать оружие') then
+                imgui.OpenPopup('Gun')
+            end
+            if imgui.BeginPopup('Gun') then
+                imgui.BeginChild('Gun', imgui.ImVec2(300,200), true)
+                if imgui.Button('/a') then
+                    sampSendChat(u8:decode('/a Выдать оружие можно: /gun /givegun'))
+                end
+                if imgui.Button('Обычный чат') then
+                    sampSendChat(u8:decode('Выдать оружие можно: /gun /givegun'))
+                end
+                imgui.EndChild()
+                imgui.EndPopup()
+            end
+            imgui.SameLine()
+            if imgui.Button('Выдать машину') then
+                imgui.OpenPopup('Veh')
+            end
+            if imgui.BeginPopup('Veh') then
+                imgui.BeginChild('Veh', imgui.ImVec2(300,200), true)
+                if imgui.Button('/a') then
+                    sampSendChat(u8:decode('/a Выдать машину можно: /veh id color1 color2'))
+                end
+                if imgui.Button('Обычный чат') then
+                    sampSendChat(u8:decode('Выдать машину можно: /veh id color1 color2'))
                 end
                 imgui.EndChild()
                 imgui.EndPopup()
@@ -1619,6 +1629,8 @@ function SoftBlueTheme()
 end
 
 function main()
+    while not isSampAvailable() do wait(0) end
+	if not sampIsLocalPlayerSpawned() then return false end
     sampRegisterChatCommand('savec',function()
         local bool, x, y, z = getPlayerCoordinatesFixed()
             if bool then
@@ -1644,7 +1656,17 @@ function main()
             sampSendChat('/i')
         end
     end)
-
+    sampRegisterChatCommand('sgm',function()
+        gm = not gm
+        if gm then
+            setCharProofs(playerPed, true, true, true, true, true)
+            writeMemory(0x96916E, 1, 1, false)
+        else
+            setCharProofs(playerPed, false, false, false, false, false)
+            writeMemory(0x96916E, 1, 0, false)
+        end
+        printStringNow('~g~GM '.. (gm and 'ACTIVATED' or 'DEACTIVATED'), 1000)
+    end)
 
     lua_thread.create(get_telegram_updates)
         getLastUpdate()
@@ -1653,6 +1675,21 @@ function main()
         wait(0)
         if wasKeyPressed(VK_R) and not sampIsCursorActive() then
             WinState[0] = not WinState[0]
+        end
+        if gm then
+            setCharProofs(playerPed, true, true, true, true, true)
+            writeMemory(0x96916E, 1, 1, false)
+        end
+        if testCheat(sgm) then
+            gm = not gm
+            if gm then
+                setCharProofs(playerPed, true, true, true, true, true)
+                writeMemory(0x96916E, 1, 1, false)
+            else
+                setCharProofs(playerPed, false, false, false, false, false)
+                writeMemory(0x96916E, 1, 0, false)
+            end
+            printStringNow('~g~GM '.. (gm and 'ACTIVATED' or 'DEACTIVATED'), 1000)
         end
     end
 end
