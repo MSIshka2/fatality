@@ -1,4 +1,4 @@
-script_version '2.0.4'
+script_version '2.0.5'
 
 require('lib.moonloader')
 local imgui = require 'mimgui'
@@ -16,6 +16,7 @@ local inicfg = require('inicfg')
 local ffi = require('ffi')
 local bitex = require 'bitex'
 local memory = require 'memory'
+local faicons = require('fAwesome6')
 local IniFilename = 'fatalitytg.ini'
 local ini = inicfg.load({
     telegramtc = {
@@ -866,7 +867,12 @@ function sampev.onServerMessage(color, text)
             sendTelegramNotification(text)
             addOneOffSound(0.0, 0.0, 0.0, 1054)
         end
-        if text:find(u8:decode("@") .. name ) then
+        if text:find(u8:decode("@") .. name) or text:find(u8:decode("@") .. name:lower()) then
+            if text:find(u8:decode("{" .. "%d+")) then
+                sampSendChat(u8:decode('[Авто-ответ] Уже бегу'))
+            else
+                sampSendChat(u8:decode('/a [Авто-ответ] Уже бегу'))
+            end
             sendTelegramNotification(text)
         end
         if text:find(u8:decode("для%s".. name)) then
@@ -1093,34 +1099,41 @@ imgui.OnInitialize(function()
         style[styleListNumber[0]+4].change()
     end
 
+    imgui.GetIO().IniFilename = nil
+    local config = imgui.ImFontConfig()
+    config.MergeMode = true
+    config.PixelSnapH = true
+    iconRanges = imgui.new.ImWchar[3](faicons.min_range, faicons.max_range, 0)
+    imgui.GetIO().Fonts:AddFontFromMemoryCompressedBase85TTF(faicons.get_font_data_base85('solid'), 14, config, iconRanges)
 end)
 
 imgui.OnFrame(function() return WinState[0] end, function(player)
+    imgui.SetNextWindowSize(imgui.ImVec2(730, 420), imgui.Cond.FirstUseEver)
     imgui.Begin('Fatality', WinState, imgui.WindowFlags.NoScrollbar + imgui.WindowFlags.NoBringToFrontOnFocus)
     if imgui.BeginTabBar('Tabs') then
-        if imgui.BeginTabItem('Основное') then
-            if imgui.Button('Спавн') then
+        if imgui.BeginTabItem('Основное ' .. faicons('HOUSE')) then
+            if imgui.Button('Спавн ' .. faicons('transporter_3')) then
                 spawnPlayer()
             end
             if imgui.IsItemHovered() then
                 imgui.BeginTooltip()
-                imgui.Text('Если не работает:')
+                imgui.Text("(" .. faicons('info') .. ') Если не работает:')
                 imgui.Text('1. /re <любой игрок>')
                 imgui.Text('2. Выйдите из /re')
                 imgui.Text('3. Нажмите кнопку спавна')
                 imgui.EndTooltip()
             end
-            if imgui.Combo('Темы',colorListNumber,colorListBuffer, #colorList) then
+            if imgui.Combo('Темы ' .. faicons('bars'),colorListNumber,colorListBuffer, #colorList) then
                 theme[colorListNumber[0]+1].change()
                 ini.telegramtc.theme = colorListNumber[0]
                 inicfg.save(ini, IniFilename)
             end
-            if imgui.Combo('Стили',styleListNumber,styleListBuffer, #styleList) then
+            if imgui.Combo('Стили ' .. faicons('bars'),styleListNumber,styleListBuffer, #styleList) then
                 style[styleListNumber[0]+1].change()
                 ini.telegramtc.style = styleListNumber[0]
                 inicfg.save(ini, IniFilename)
             end
-            if imgui.Button('Обновить скрипт') then
+            if imgui.Button('Обновить скрипт ' .. faicons('file')) then
                 update()
             end
                 imgui.BeginChild("ChatLog", imgui.ImVec2(checkx[0], checky[0]), true)      
@@ -1128,18 +1141,18 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                     imgui.TextWrapped(msg)
                 end
                 imgui.EndPopup()
-                imgui.SetCursorPos(imgui.ImVec2(checkx[0]-485, checky[0]+230))
-            if imgui.Button('Очистить') then
+                imgui.SetCursorPos(imgui.ImVec2(checkx[0]-490, checky[0]+230))
+            if imgui.Button('Очистить ' .. faicons('broom')) then
                 messages = {}
             end
-            imgui.SetCursorPos(imgui.ImVec2(checkx[0]-400, checky[0]+230.5))
-            if imgui.Button('Настройки') then
+            imgui.SetCursorPos(imgui.ImVec2(checkx[0]-390, checky[0]+230.5))
+            if imgui.Button('Настройки ' .. faicons('gear')) then
                 imgui.OpenPopup('Settings')
             end
             if imgui.BeginPopup('Settings') then
-                imgui.SliderFloat('X', checkx, 1, 1000)
-                imgui.SliderFloat('Y', checky, 1, 1000)
-                if imgui.Button('Reset') then
+                imgui.SliderFloat('X ' .. faicons('chart_bullet'), checkx, 1, 1000)
+                imgui.SliderFloat('Y ' .. faicons('chart_bullet'), checky, 1, 1000)
+                if imgui.Button('Reset ' .. faicons('rotate_right')) then
                     checkx[0] = 500.000
                     checky[0] = 150.000
                 end
@@ -1150,21 +1163,21 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             imgui.TextQuestion("(?)", "Author: Harry_Pattersone")
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Машины') then
-            if imgui.Button('Открыть список машин') then
+        if imgui.BeginTabItem('Машины ' .. faicons('CAR')) then
+            if imgui.Button('Открыть список машин ' .. faicons('list')) then
                 imgui.OpenPopup('List Cars')
             end
             imgui.SameLine()
-            if imgui.Button("Добавить в избранное") then
+            if imgui.Button("Добавить в избранное " .. faicons('clipboard')) then
                 local vehicleID = charArrayToString(inputField, 256)
                 table.insert(favoritesVehicles, vehicleID)
                 writeToFile(getGameDirectory() .. "\\moonloader\\fatality\\favoritescar.txt", {vehicleID})
             end
             if imgui.BeginPopup('List Cars') then
                 imgui.BeginChild('FileContent', imgui.ImVec2(900, 700), true)
-                imgui.InputText('Название/ID машины', carbuffer, 256)
+                imgui.InputText('Название/ID машины ' .. faicons('input_text'), carbuffer, 256)
                 imgui.SameLine()
-                if imgui.Button('Поиск') then
+                if imgui.Button('Поиск ' .. faicons('magnifying_glass')) then
                     searchResults = {}
                     local search = charArrayToString(carbuffer, 256)
                     for line in io.lines(getGameDirectory() .. "\\moonloader\\fatality\\vehicles.txt") do
@@ -1174,47 +1187,47 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 end
                 imgui.TextUnformatted(fileContent)
                 imgui.EndChild()
-                if imgui.Button('Закрыть', imgui.ImVec2(280, 30)) then
+                if imgui.Button('Закрыть ' .. faicons('xmark'), imgui.ImVec2(280, 30)) then
                     imgui.CloseCurrentPopup()
                 end
                 imgui.EndPopup()
             end
-            imgui.InputText("ID машины", inputField, 256)
-            if imgui.Button("Создать машину") then
+            imgui.InputText("ID машины " .. faicons('input_text'), inputField, 256)
+            if imgui.Button("Создать машину " .. faicons('car')) then
                 local vehicleID = charArrayToString(inputField,256)
                 sampSendChat('/veh ' .. vehicleID .. ' 1 1')
             end
-            imgui.SetCursorPos(imgui.ImVec2(135, 151.0))
-            if imgui.Button("Удалить машину") then
+            imgui.SetCursorPos(imgui.ImVec2(147, 151.0))
+            if imgui.Button("Удалить машину " .. faicons('trash')) then
                 sampSendChat('/adelveh')
             end
             imgui.SetCursorPos(imgui.ImVec2(15, 182.0))
-            if imgui.Button("Починить машину") then
+            if imgui.Button("Починить машину " .. faicons('wrench')) then
                 local playerid = select(2,sampGetPlayerIdByCharHandle(PLAYER_PED))
                 sampSendChat('/hp ' .. playerid )
             end
-            imgui.SetCursorPos(imgui.ImVec2(143, 182.0))
-            if imgui.Button("Перевернуть машину") then
+            imgui.SetCursorPos(imgui.ImVec2(156, 182.0))
+            if imgui.Button("Перевернуть машину " .. faicons('repeat')) then
                 veh = getCarCharIsUsing(PLAYER_PED)
                 setVehicleQuaternion(veh, 0, 0, 0, 0)
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Скины') then
-            if imgui.Button('Открыть список скинов') then
+        if imgui.BeginTabItem('Скины ' .. faicons('USER')) then
+            if imgui.Button('Открыть список скинов ' .. faicons('list')) then
                 imgui.OpenPopup('List Skins')
             end
             imgui.SameLine()
-            if imgui.Button("Добавить в избранное") then
+            if imgui.Button("Добавить в избранное " .. faicons('clipboard')) then
                 local skinID = charArrayToString(inputField2, 256)
                 table.insert(favoritesSkins, skinID)
                 writeToFile(getGameDirectory() .. "\\moonloader\\fatality\\favoritesskin.txt", {skinID})
             end
             if imgui.BeginPopup('List Skins') then
                 imgui.BeginChild('FileContent2', imgui.ImVec2(900, 700), true)
-                imgui.InputText('Название/ID скина', skinbuffer, 256)
+                imgui.InputText('Название/ID скина ' .. faicons('input_text'), skinbuffer, 256)
                 imgui.SameLine()
-                if imgui.Button('Поиск') then
+                if imgui.Button('Поиск ' .. faicons('magnifying_glass')) then
                     searchResults = {}
                     local search = charArrayToString(skinbuffer, 256)
                     for line in io.lines(getGameDirectory() .. "\\moonloader\\fatality\\skins.txt") do
@@ -1224,72 +1237,72 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 end
                 imgui.TextUnformatted(fileContent2)
                 imgui.EndChild()
-                if imgui.Button('Закрыть', imgui.ImVec2(280, 30)) then
+                if imgui.Button('Закрыть ' .. faicons('xmark'), imgui.ImVec2(280, 30)) then
                     imgui.CloseCurrentPopup()
                 end
                 imgui.EndPopup()
             end
-            imgui.InputText("ID скина", inputField2, 256)
-            if imgui.Button("Сменить скин") then
+            imgui.InputText("ID скина " .. faicons('input_text'), inputField2, 256)
+            if imgui.Button("Сменить скин " .. faicons('user')) then
                 local skinID = charArrayToString(inputField2,256)
                 sampSendChat('/skin ' .. skinID)
                 
             end
             imgui.PushItemWidth(30)
-            imgui.InputText('1 акс', inputa1, 10)
+            imgui.InputText('1 акс ' .. faicons('glasses'), inputa1, 10)
             imgui.PushItemWidth(30)
-            imgui.InputText('2 акс', inputa2, 10)
-            if imgui.Button('Применить') then
+            imgui.InputText('2 акс ' .. faicons('glasses'), inputa2, 10)
+            if imgui.Button('Применить ' .. faicons('check')) then
                 local aksID = charArrayToString(inputa1,256)
                 local aksID2 = charArrayToString(inputa2,256)
                 sampSendChat('/launcher ' .. aksID)
                 sampSendChat('/launcher ' .. aksID2)
             end
-            if imgui.Button('Очистить аксы') then
+            if imgui.Button('Очистить аксы ' .. faicons('trash')) then
                 sampSendChat('/reset')
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Избранное') then
+        if imgui.BeginTabItem('Избранное ' ..  faicons('CLIPBOARD')) then
         
-            if imgui.Button('Открыть избранные машины') then
+            if imgui.Button('Открыть избранные машины ' .. faicons('folder_open')) then
                 imgui.OpenPopup('Favorites Car')
             end
             if imgui.BeginPopup('Favorites Car') then
                 imgui.BeginChild('FileContent3', imgui.ImVec2(400, 300), true)
                 imgui.TextUnformatted(fileContent3)
                 imgui.EndChild()
-                if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                if imgui.Button('Закрыть ' .. faicons('xmark'), imgui.ImVec2(280, 24)) then
                     imgui.CloseCurrentPopup()
                 end
                 imgui.EndPopup()
             end
         
-            if imgui.Button('Открыть избранные скины') then
+            if imgui.Button('Открыть избранные скины ' .. faicons('folder_open')) then
                 imgui.OpenPopup('Favorites Skins')
             end
             if imgui.BeginPopup('Favorites Skins') then
                 imgui.BeginChild('FileContent4', imgui.ImVec2(400, 300), true)
                 imgui.TextUnformatted(fileContent4)
                 imgui.EndChild()
-                if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                if imgui.Button('Закрыть ' .. faicons('xmark'), imgui.ImVec2(280, 24)) then
                     imgui.CloseCurrentPopup()
                 end
                 imgui.EndPopup()
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Команды') then
+        if imgui.BeginTabItem('Команды ' ..  faicons('TEXT')) then
             if dostup[0] == false then
-                imgui.InputText('Пароль', password,256)
+                imgui.InputText('Пароль ' .. faicons('key'), password,256)
                 local inputp = charArrayToString(password,256)
-                if imgui.Button('Принять') then
+                if imgui.Button('Принять ' .. faicons('check')) then
                     if inputp == fatality() then
                         dostup[0] = true
                     end
                 end
             else
-                if imgui.Button('1 АКЛ') then
+                if imgui.Button('1 АКЛ ' .. faicons('square_1')) then
                     imgui.OpenPopup('1 ACL')
                 end
                 if imgui.BeginPopup('1 ACL') then
@@ -1298,13 +1311,13 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                         imgui.TextUnformatted(command)
                     end
                     imgui.EndChild()
-                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                    if imgui.Button('Закрыть ' .. faicons('xmark'), imgui.ImVec2(280, 24)) then
                         imgui.CloseCurrentPopup()
                     end
                     imgui.EndPopup()
                 end
                 imgui.SameLine()
-                if imgui.Button('2 АКЛ') then
+                if imgui.Button('2 АКЛ ' .. faicons('square_2')) then
                     imgui.OpenPopup('2 ACL')
                 end
                 if imgui.BeginPopup('2 ACL') then
@@ -1313,12 +1326,12 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                         imgui.TextUnformatted(command)
                     end
                     imgui.EndChild()
-                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                    if imgui.Button('Закрыть ' .. faicons('xmark'), imgui.ImVec2(280, 24)) then
                         imgui.CloseCurrentPopup()
                     end
                     imgui.EndPopup()
                 end
-                if imgui.Button('3 АКЛ') then
+                if imgui.Button('3 АКЛ ' .. faicons('square_3')) then
                     imgui.OpenPopup('3 ACL')
                 end
                 if imgui.BeginPopup('3 ACL') then
@@ -1327,13 +1340,13 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                         imgui.TextUnformatted(command)
                     end
                     imgui.EndChild()
-                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                    if imgui.Button('Закрыть ' .. faicons('xmark'), imgui.ImVec2(280, 24)) then
                         imgui.CloseCurrentPopup()
                     end
                     imgui.EndPopup()
                 end
                 imgui.SameLine()
-                if imgui.Button('4 АКЛ') then
+                if imgui.Button('4 АКЛ ' .. faicons('square_4')) then
                     imgui.OpenPopup('4 ACL')
                 end
                 if imgui.BeginPopup('4 ACL') then
@@ -1342,12 +1355,12 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                         imgui.TextUnformatted(command)
                     end
                     imgui.EndChild()
-                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                    if imgui.Button('Закрыть ' .. faicons('xmark'), imgui.ImVec2(280, 24)) then
                         imgui.CloseCurrentPopup()
                     end
                     imgui.EndPopup()
                 end
-                if imgui.Button('5 АКЛ') then
+                if imgui.Button('5 АКЛ ' .. faicons('square_5')) then
                     imgui.OpenPopup('5 ACL')
                 end
                 if imgui.BeginPopup('5 ACL') then
@@ -1356,13 +1369,13 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                         imgui.TextUnformatted(command)
                     end
                     imgui.EndChild()
-                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                    if imgui.Button('Закрыть ' .. faicons('xmark'), imgui.ImVec2(280, 24)) then
                         imgui.CloseCurrentPopup()
                     end
                     imgui.EndPopup()
                 end
                 imgui.SameLine()
-                if imgui.Button('6 АКЛ') then
+                if imgui.Button('6 АКЛ ' .. faicons('square_6')) then
                     imgui.OpenPopup('6 ACL')
                 end
                 if imgui.BeginPopup('6 ACL') then
@@ -1371,12 +1384,12 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                         imgui.TextUnformatted(command)
                     end
                     imgui.EndChild()
-                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                    if imgui.Button('Закрыть ' .. faicons('xmark'), imgui.ImVec2(280, 24)) then
                         imgui.CloseCurrentPopup()
                     end
                     imgui.EndPopup()
                 end
-                if imgui.Button('7 АКЛ') then
+                if imgui.Button('7 АКЛ ' .. faicons('square_7')) then
                     imgui.OpenPopup('7 ACL')
                 end
                 if imgui.BeginPopup('7 ACL') then
@@ -1385,13 +1398,13 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                         imgui.TextUnformatted(command)
                     end
                     imgui.EndChild()
-                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                    if imgui.Button('Закрыть ' .. faicons('xmark'), imgui.ImVec2(280, 24)) then
                         imgui.CloseCurrentPopup()
                     end
                     imgui.EndPopup()
                 end
                 imgui.SameLine()
-                if imgui.Button('8 АКЛ') then
+                if imgui.Button('8 АКЛ ' .. faicons('square_8')) then
                     imgui.OpenPopup('8 ACL')
                 end
                 if imgui.BeginPopup('8 ACL') then
@@ -1400,12 +1413,12 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                         imgui.TextUnformatted(command)
                     end
                     imgui.EndChild()
-                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                    if imgui.Button('Закрыть ' .. faicons('xmark'), imgui.ImVec2(280, 24)) then
                         imgui.CloseCurrentPopup()
                     end
                     imgui.EndPopup()
                 end
-                if imgui.Button('9 АКЛ') then
+                if imgui.Button('9 АКЛ ' .. faicons('square_9')) then
                     imgui.OpenPopup('9 ACL')
                 end
                 if imgui.BeginPopup('9 ACL') then
@@ -1414,7 +1427,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                         imgui.TextUnformatted(command)
                     end
                     imgui.EndChild()
-                    if imgui.Button('Закрыть', imgui.ImVec2(280, 24)) then
+                    if imgui.Button('Закрыть ' .. faicons('xmark'), imgui.ImVec2(280, 24)) then
                         imgui.CloseCurrentPopup()
                     end
                     imgui.EndPopup()
@@ -1423,8 +1436,8 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Ответы') then
-            if imgui.Button('Повышение админки') then
+        if imgui.BeginTabItem('Ответы ' .. faicons('COMMENT')) then
+            if imgui.Button('Повышение админки ' .. faicons('up')) then
                 imgui.OpenPopup('ADM')
             end
             if imgui.BeginPopup('ADM') then
@@ -1439,7 +1452,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.EndPopup()
             end
             imgui.SameLine()
-            if imgui.Button('Получение REP') then
+            if imgui.Button('Получение REP ' .. faicons('ruble_sign')) then
                 imgui.OpenPopup('REP')
             end
             if imgui.BeginPopup('REP') then
@@ -1456,7 +1469,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             if imgui.Button('Казино') then
                 imgui.OpenPopup('Casino')
             end
-            if imgui.BeginPopup('Casino') then
+            if imgui.BeginPopup('Casino ' .. faicons('dice')) then
                 imgui.BeginChild('Casino', imgui.ImVec2(300,200), true)
                 if imgui.Button('/a') then
                     sampSendChat(u8:decode('/a Казино находится: /gps > Бизнесы > Казино "Лос-Сантос"'))
@@ -1468,7 +1481,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.EndPopup()
             end
             imgui.SameLine()
-            if imgui.Button('Двигатель') then
+            if imgui.Button('Двигатель ' .. faicons('engine')) then
                 imgui.OpenPopup('Engine')
             end
             if imgui.BeginPopup('Engine') then
@@ -1482,7 +1495,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.EndChild()
                 imgui.EndPopup()
             end
-            if imgui.Button('Купить админку') then
+            if imgui.Button('Купить админку ' .. faicons('credit_card')) then
                 imgui.OpenPopup('Buyadm')
             end
             if imgui.BeginPopup('Buyadm') then
@@ -1497,7 +1510,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.EndPopup()
             end
             imgui.SameLine()
-            if imgui.Button('Покупка аксов') then
+            if imgui.Button('Покупка аксов ' .. faicons('credit_card')) then
                 imgui.OpenPopup('Acs')
             end
             if imgui.BeginPopup('Acs') then
@@ -1511,7 +1524,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.EndChild()
                 imgui.EndPopup()
             end
-            if imgui.Button('Выдать оружие') then
+            if imgui.Button('Выдать оружие ' .. faicons('gun')) then
                 imgui.OpenPopup('Gun')
             end
             if imgui.BeginPopup('Gun') then
@@ -1526,7 +1539,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.EndPopup()
             end
             imgui.SameLine()
-            if imgui.Button('Выдать машину') then
+            if imgui.Button('Выдать машину ' .. faicons('car')) then
                 imgui.OpenPopup('Veh')
             end
             if imgui.BeginPopup('Veh') then
@@ -1540,7 +1553,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 imgui.EndChild()
                 imgui.EndPopup()
             end
-            if imgui.Button('Инфо') then
+            if imgui.Button('Инфо ' .. faicons('circle_info')) then
                 imgui.OpenPopup('Info')
             end
             if imgui.BeginPopup('Info') then
@@ -1556,12 +1569,12 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Телеграм') then
-            imgui.InputText('Token', tokenbuffer, 256)
+        if imgui.BeginTabItem('Телеграм ' .. faicons('messages')) then
+            imgui.InputText('Token ' .. faicons('key'), tokenbuffer, 256)
             token = charArrayToString(tokenbuffer,256)
-            imgui.InputText('chatid', chatidbuffer, 256)
+            imgui.InputText('chatid ' .. faicons('comment') .. faicons('key'), chatidbuffer, 256)
             chat_id = charArrayToString(chatidbuffer,256)
-            if imgui.Button('Сохранить') then
+            if imgui.Button('Сохранить ' .. faicons('cloud')) then
                 ini.telegramtc.token = token
                 ini.telegramtc.chat_id = chat_id
                 sampAddChatMessage('Token: ' .. ini.telegramtc.token,-1)
@@ -1589,7 +1602,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
                 end
             end
             imgui.EndChild()
-            if imgui.Button('Копировать выделенное') then
+            if imgui.Button('Копировать выделенное ' .. faicons('clipboard')) then
                 if selectedText ~= "" then
                     imgui.SetClipboardText(selectedText)
                 end
@@ -1598,7 +1611,7 @@ imgui.OnFrame(function() return WinState[0] end, function(player)
             imgui.Text('Нет результата')
         end
 
-        if imgui.Button('Закрыть') then
+        if imgui.Button('Закрыть ' .. faicons('xmark')) then
             showSearchWindow = false
         end
         imgui.End()
